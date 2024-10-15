@@ -13,6 +13,9 @@ inputs:
   translationsFolder:
     description: 'Folder to store translations'
     required: true
+  GH_TOKEN:
+    description: 'GitHub Token'
+    required: true
 
 runs:
   using: "composite"
@@ -23,7 +26,7 @@ runs:
       env:
         mainBranch: main
         repositoryId: ${{ github.repository }}
-        GH_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ inputs.GH_TOKEN }}
       shell: pwsh
     
     - name: Checkout to existing translations branch
@@ -31,6 +34,12 @@ runs:
       uses: actions/checkout@v4
       with:
         ref: ${{ steps.pr_check.outputs.translationsBranch }}
+    
+    - name: Checkout to the main branch
+      if : ${{ steps.pr_check.outputs.createPullRequest == 'true' }}
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ steps.pr_check.outputs.sourceBranch }}
     
     - name: Checkout to new translations branch
       if : ${{ steps.pr_check.outputs.createPullRequest == 'true' }}
@@ -63,7 +72,7 @@ runs:
         sourceBranch: ${{ steps.pr_check.outputs.sourceBranch }}
         translationsBranch: ${{ steps.pr_check.outputs.translationsBranch }}
         changesDetected: ${{ steps.translations_check.outputs.changesDetected }}
-        GH_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ inputs.GH_TOKEN }}
       shell: pwsh
       
     - name: Translations PR Create
@@ -75,5 +84,5 @@ runs:
         createPullRequest: ${{ steps.pr_check.outputs.createPullRequest }}
       # reviewer: 'flipdishbytes/delivery-enablement-team'
         repositoryId: ${{ github.repository }}
-        GH_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ inputs.GH_TOKEN }}
       shell: pwsh
