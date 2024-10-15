@@ -31,6 +31,13 @@ runs:
       uses: actions/checkout@v4
       with:
         ref: ${{ steps.pr_check.outputs.translationsBranch }}
+    
+    - name: Checkout to new translations branch
+      if : ${{ steps.pr_check.outputs.createPullRequest == 'true' }}
+      run: git checkout -b $translationsBranch
+      env:
+        translationsBranch: ${{ steps.pr_check.outputs.translationsBranch }}
+      shell: bash
 
     - name: Translations Download
       run: ${{ github.action_path }}/scripts/TranslationsDownload.ps1
