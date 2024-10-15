@@ -1,0 +1,72 @@
+name: 'Loco Translations'
+description: 'Download and update translations from Loco. Creates Pull Request with changes.'
+inputs:
+  locoExportKey:
+    description: 'Loco Export Key'
+    required: true
+  langs:
+    description: 'Languages to download'
+    required: true
+  format:
+    description: 'Format of the translations'
+    required: true
+  translationsFolder:
+    description: 'Folder to store translations'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Translations PR Check
+      id: pr_check
+      run: scripts/TranslationsPRCheck.ps1
+      env:
+        mainBranch: main
+        repositoryId: ${{ github.repository }}
+        GH_TOKEN: ${{ github.token }}
+      shell: pwsh
+    
+    - name: Checkout to existing translations branch
+      if : ${{ steps.pr_check.outputs.createPullRequest == 'false' }}
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ steps.pr_check.outputs.translationsBranch }}
+
+    - name: Translations Download
+      run: scripts/TranslationsDownload.ps1
+      env:
+        locoExportKey: ${{ inputs.locoExportKey }}
+        tmpFolder: ${{ runner.temp }}/tmp_translations
+        langs: ${{ inputs.langs }}
+        format: ${{ inputs.format }}
+      shell: pwsh
+      
+    - name: Translations Apply
+      id: translations_check
+      run: scripts/TranslationsApply.ps1
+      env:
+        tmpFolder: ${{ runner.temp }}/tmp_translations
+        targetFolder: ${{ github.workspace }}/${{ inputs.translationsFolder }}
+      shell: pwsh
+      
+    - name: Translations Push
+      if : ${{ steps.translations_check.outputs.changesDetected == 'true' }}
+      run: scripts/TranslationsPush.ps1
+      env:
+        sourceBranch: ${{ steps.pr_check.outputs.sourceBranch }}
+        translationsBranch: ${{ steps.pr_check.outputs.translationsBranch }}
+        changesDetected: ${{ steps.translations_check.outputs.changesDetected }}
+        GH_TOKEN: ${{ github.token }}
+      shell: pwsh
+      
+    - name: Translations PR Create
+      if : ${{ steps.pr_check.outputs.createPullRequest == 'true' }}
+      run: scripts/TranslationsPRCreate.ps1
+      env:
+        sourceBranch: ${{ steps.pr_check.outputs.sourceBranch }}
+        translationsBranch: ${{ steps.pr_check.outputs.translationsBranch }}
+        createPullRequest: ${{ steps.pr_check.outputs.createPullRequest }}
+      # reviewer: 'flipdishbytes/delivery-enablement-team'
+        repositoryId: ${{ github.repository }}
+        GH_TOKEN: ${{ github.token }}
+      shell: pwsh
