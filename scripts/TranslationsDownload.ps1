@@ -21,10 +21,7 @@ function CreateTmpFolder([String] $tmpFolder){
 function DownloadResx([String] $tmpFolder,[String] $lang,[String] $locoExportKey){
     $url = "https://localise.biz/api/export/locale/{0}.resx?status=translated&key={1}" -f $lang, $locoExportKey
 
-    if($lang -eq "en"){
-        $fileName = "Resources.resx";
-    }
-    $fileName =  "Resources.{0}.resx" -f $lang
+    if($lang -eq "en") { $fileName = "Resources.resx" } else { $fileName = "Resources.{0}.resx" -f $lang }
 
     $path = "{0}\{1}" -f $tmpFolder, $fileName
 
