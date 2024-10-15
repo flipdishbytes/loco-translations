@@ -17,16 +17,9 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: List action directory
-      shell: bash
-      run: ls -R
-
     - name: Translations PR Check
       id: pr_check
-      run: ./scripts/TranslationsPRCheck.ps1
+      run: ${{ github.action_path }}/scripts/TranslationsPRCheck.ps1
       env:
         mainBranch: main
         repositoryId: ${{ github.repository }}
@@ -40,7 +33,7 @@ runs:
         ref: ${{ steps.pr_check.outputs.translationsBranch }}
 
     - name: Translations Download
-      run: ./scripts/TranslationsDownload.ps1
+      run: ${{ github.action_path }}/scripts/TranslationsDownload.ps1
       env:
         locoExportKey: ${{ inputs.locoExportKey }}
         tmpFolder: ${{ runner.temp }}/tmp_translations
@@ -50,7 +43,7 @@ runs:
       
     - name: Translations Apply
       id: translations_check
-      run: ./scripts/TranslationsApply.ps1
+      run: ${{ github.action_path }}/scripts/TranslationsApply.ps1
       env:
         tmpFolder: ${{ runner.temp }}/tmp_translations
         targetFolder: ${{ github.workspace }}/${{ inputs.translationsFolder }}
@@ -58,7 +51,7 @@ runs:
       
     - name: Translations Push
       if : ${{ steps.translations_check.outputs.changesDetected == 'true' }}
-      run: ./scripts/TranslationsPush.ps1
+      run: ${{ github.action_path }}/scripts/TranslationsPush.ps1
       env:
         sourceBranch: ${{ steps.pr_check.outputs.sourceBranch }}
         translationsBranch: ${{ steps.pr_check.outputs.translationsBranch }}
@@ -68,7 +61,7 @@ runs:
       
     - name: Translations PR Create
       if : ${{ steps.pr_check.outputs.createPullRequest == 'true' }}
-      run: ./scripts/TranslationsPRCreate.ps1
+      run: ${{ github.action_path }}/scripts/TranslationsPRCreate.ps1
       env:
         sourceBranch: ${{ steps.pr_check.outputs.sourceBranch }}
         translationsBranch: ${{ steps.pr_check.outputs.translationsBranch }}
