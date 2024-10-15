@@ -28,8 +28,12 @@ function DownloadResx([String] $tmpFolder,[String] $lang,[String] $locoExportKey
     "Downloading to $path..."
     Invoke-WebRequest -Uri $url -OutFile $path
 
-    # "Removing Loco comments from $path..."
-    # Get-Content $path | Where-Object { $_ -notmatch "^  Exported at" -and $_ -notmatch "^  Exported by" } | Set-Content $path
+    $tmppath = $path + ".tmp"
+    "Removing Loco comments from $path"
+    Get-Content $path | Where-Object { $_ -notmatch "^  Exported at" } | Where-Object { $_ -notmatch "^  Exported by" } | Set-Content $tmppath
+    Write-Host $path
+    Remove-Item $path
+    Rename-Item -Path $tmppath -NewName $fileName
 }
 
 function DownloadJson([String] $tmpFolder,[String] $lang,[String] $locoExportKey){
