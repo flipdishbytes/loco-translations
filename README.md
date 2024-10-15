@@ -55,11 +55,11 @@ jobs:
           translationsFolder: 'src/DotNET.Translations' #the folder where yout translation files are located.
           GH_TOKEN: ${{ github.token }} # leave it like that of you don't need to assign PR to teams for review.
           #GH_TOKEN: ${{ secrets.GH_TOKEN }} # use this if you need to assign PR to teams.
-          #reviewer: 'flipdishbytes/delivery-enablement-team' # You have to set GH_TOKEN to your PAT if you want to add teams as revievers.
+          #reviewer: 'flipdishbytes/delivery-enablement-team' # You have to set GH_TOKEN to your PAT if you want to add teams as revievers. Use comma if you need more than one team.
 ```
 
 ### GitHub Actions PAT for assigning PRs to teams.
-❗ Requinred only to assign PRs review to teams. GitHub actions internal PAT doesn't have access to read groups.
+❗ Required only to assign PRs review to teams. GitHub actions internal PAT doesn't have access to read groups. No need to do this if you are not going to assign your PRs to teams.
 1. Go to `https://github.com/settings/personal-access-tokens`
 2. Create Fine-grained token based on the example
 ![GitHub Actions PAT Example](GitHubActionsPAT.png)
