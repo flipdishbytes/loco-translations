@@ -19,7 +19,7 @@ To use this Datadog CI action, add it to your pipeline workflow YAML file. Here 
 
 ### How to use?
 
-⛔️ Make sure you enabled `Automatically delete head branches ` in yout GitHub repository so after pull requests are merged, you can have head branches deleted automatically.
+❗ Make sure you enabled `Automatically delete head branches ` in yout GitHub repository so after pull requests are merged, you can have head branches deleted automatically.
 
 ```yaml
 name: GH Action workflow to download and apply Loco Translations
@@ -43,14 +43,22 @@ jobs:
         uses: flipdishbytes/loco-translations@v1.0
         with:
           locoExportKey: ${{ secrets.LOCOEXPORTKEY }} # https://localise.biz -> Project -> Developer tools -> Export key from your Loco project. Set LOCOEXPORTKEY secret in your GitHub Actions.
+          #mainBranch: main # it's main by default. Set it to your repository default branch if it's needed. Not required.
           langs: 'en,bg,de,es,fr,it,nl,pl,pt,fi' #language tags should match Loco languages from the project
-          format: 'resx' 
+          format: 'resx'
           # supported formats: 
           #     resx (for .NET projects),
           #     json (for Android and other ptojects using json language files),
           #     lproj (for iOS projects).
           translationsFolder: 'src/DotNET.Translations' #the folder where yout translation files are located.
-          GH_TOKEN: ${{ github.token }} # leave it like that of you don't need to assign PR to groups for review.
-          mainBranch: main # it's main by default. Set it to your repository default branch.
+          GH_TOKEN: ${{ github.token }} # leave it like that of you don't need to assign PR to teams for review.
+          #GH_TOKEN: ${{ secrets.GH_TOKEN }} # use this if you need to assign PR to teams.
           #reviewer: 'flipdishbytes/delivery-enablement-team' # You have to set GH_TOKEN to your PAT if you want to add teams as revievers.
 ```
+
+### GitHub Actions PAT for assigning PRs to teams.
+❗ Requinred only to assign PRs review to teams. GitHub actions internal PAT doesn't have access to read groups.
+1. Go to `https://github.com/settings/personal-access-tokens`
+2. Create Fine-grained token based on the example
+![GitHub Actions PAT Example](GitHubActionsPAT.png)
+3. Add `GH_TOKEN` secret to your GitHub Actions repo.
