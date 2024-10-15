@@ -57,8 +57,8 @@ function DownloadLproj([String] $tmpFolder,[String] $lang,[String] $locoExportKe
     $urlInfoPlist = "https://localise.biz/api/export/locale/{0}.plist?status=translated&charset=utf8&key={1}" -f $lang, $locoExportKey
 
 
-    $pathStrings = "{0}\{1}" -f $tmpFolder, $fileNameStrings
-    $pathInfoPlist = "{0}\{1}" -f $tmpFolder, $fileNameInfoPlist
+    $pathStrings = "{0}\{1}\{2}" -f $tmpFolder, $folderName, $fileNameStrings
+    $pathInfoPlist = "{0}\{1}\{2}" -f $tmpFolder, $folderName, $fileNameInfoPlist
 
     "Downloading to $folderName..."
     Invoke-WebRequest -Uri $urlStrings -OutFile $pathStrings
