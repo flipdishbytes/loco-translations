@@ -27,6 +27,9 @@ name: GH Action workflow to download and apply Loco Translations
 on:
   # allow to run manually
   workflow_dispatch:
+  # run on schedule every 3 hours at 0 minutes
+  schedule:
+  - cron: "0 */3 * * *"
 
 permissions: 
   id-token: write
