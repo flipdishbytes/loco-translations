@@ -28,8 +28,8 @@ on:
 
 permissions: 
   id-token: write
-  contents: write
-  pull-requests: write
+  contents: write # must be set
+  pull-requests: write # must be set
 
 
 jobs:
