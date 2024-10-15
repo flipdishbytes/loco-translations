@@ -46,8 +46,9 @@ function DownloadJson([String] $tmpFolder,[String] $lang,[String] $locoExportKey
 function DownloadLproj([String] $tmpFolder,[String] $lang,[String] $locoExportKey){
     $folderName = "{0}.lproj" -f $lang
 
-    if (!(Test-Path $folderName)) {
-        New-Item -ItemType Directory -Path $folderName
+    if (!(Test-Path "$tmpFolder/$folderName")) {
+        New-Item -ItemType Directory -Path "$tmpFolder/$folderName"
+        Write-Host "Creating $tmpFolder/$folderName..."
     }
 
     $fileNameStrings = "Localizable.strings"
