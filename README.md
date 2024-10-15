@@ -19,6 +19,8 @@ To use this Datadog CI action, add it to your pipeline workflow YAML file. Here 
 
 ### How to use?
 
+⛔️ Make sure you enabled `Automatically delete head branches ` in yout GitHub repository so after pull requests are merged, you can have head branches deleted automatically.
+
 ```yaml
 name: GH Action workflow to download and apply Loco Translations
 
