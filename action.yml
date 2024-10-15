@@ -20,6 +20,9 @@ inputs:
     description: 'Main branch'
     required: false
     default: 'main'
+  reviewer:
+    description: 'Reviewer for the PR'
+    required: false
 
 runs:
   using: "composite"
@@ -89,4 +92,5 @@ runs:
       # reviewer: 'flipdishbytes/delivery-enablement-team'
         repositoryId: ${{ github.repository }}
         GH_TOKEN: ${{ inputs.GH_TOKEN }}
+        reviewer: ${{ inputs.reviewer }}
       shell: pwsh

@@ -52,4 +52,5 @@ jobs:
           translationsFolder: 'src/DotNET.Translations' #the folder where yout translation files are located.
           GH_TOKEN: ${{ github.token }} # leave it like that of you don't need to assign PR to groups for review.
           mainBranch: main # it's main by default. Set it to your repository default branch.
+          #reviewer: 'flipdishbytes/delivery-enablement-team' # You have to set GH_TOKEN to your PAT if you want to add teams as revievers.
 ```
