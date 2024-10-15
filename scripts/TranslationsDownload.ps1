@@ -53,8 +53,8 @@ function DownloadLproj([String] $tmpFolder,[String] $lang,[String] $locoExportKe
     $fileNameStrings = "Localizable.strings"
     $fileNameInfoPlist = "InfoPlist.strings"
 
-    $urlStrings = "https://localise.biz/api/export/locale/{0}.strings?status=translated&key={1}" -f $lang, $locoExportKey
-    $urlInfoPlist = "https://localise.biz/api/export/locale/{0}.plist?status=translated&key={1}" -f $lang, $locoExportKey
+    $urlStrings = "https://localise.biz/api/export/locale/{0}.strings?status=translated&charset=utf8&key={1}" -f $lang, $locoExportKey
+    $urlInfoPlist = "https://localise.biz/api/export/locale/{0}.plist?status=translated&charset=utf8&key={1}" -f $lang, $locoExportKey
 
 
     $pathStrings = "{0}\{1}" -f $tmpFolder, $fileNameStrings
