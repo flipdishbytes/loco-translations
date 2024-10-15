@@ -50,7 +50,7 @@ jobs:
           format: 'resx'
           # supported formats: 
           #     resx (for .NET projects),
-          #     json (for Android and other ptojects using json language files),
+          #     json (for Android and other projects using json language files),
           #     lproj (for iOS projects).
           translationsFolder: 'src/DotNET.Translations' #the folder where yout translation files are located.
           GH_TOKEN: ${{ github.token }} # leave it like that of you don't need to assign PR to teams for review.
