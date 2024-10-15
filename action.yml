@@ -16,6 +16,10 @@ inputs:
   GH_TOKEN:
     description: 'GitHub Token'
     required: true
+  mainBranch:
+    description: 'Main branch'
+    required: false
+    default: 'main'
 
 runs:
   using: "composite"
@@ -24,7 +28,7 @@ runs:
       id: pr_check
       run: ${{ github.action_path }}/scripts/TranslationsPRCheck.ps1
       env:
-        mainBranch: main
+        mainBranch: ${{ inputs.mainBranch }}
         repositoryId: ${{ github.repository }}
         GH_TOKEN: ${{ inputs.GH_TOKEN }}
       shell: pwsh
