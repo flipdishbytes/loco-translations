@@ -29,7 +29,7 @@ on:
   workflow_dispatch:
   # run on schedule every 3 hours at 0 minutes
   schedule:
-  - cron: "0 */3 * * *"
+    - cron: "0 */3 * * *"
 
 permissions: 
   id-token: write
