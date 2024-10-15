@@ -17,6 +17,13 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: List action directory
+      shell: bash
+      run: ls -R
+
     - name: Translations PR Check
       id: pr_check
       run: ./scripts/TranslationsPRCheck.ps1
