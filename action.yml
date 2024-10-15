@@ -76,7 +76,7 @@ runs:
       shell: pwsh
       
     - name: Translations PR Create
-      if : ${{ steps.pr_check.outputs.createPullRequest == 'true' }}
+      if : ${{ steps.pr_check.outputs.createPullRequest == 'true' }} && ${{ steps.translations_check.outputs.changesDetected == 'true' }}
       run: ${{ github.action_path }}/scripts/TranslationsPRCreate.ps1
       env:
         sourceBranch: ${{ steps.pr_check.outputs.sourceBranch }}
