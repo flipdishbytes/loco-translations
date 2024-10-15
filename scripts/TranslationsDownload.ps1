@@ -61,9 +61,15 @@ function DownloadLproj([String] $tmpFolder,[String] $lang,[String] $locoExportKe
     $pathStrings = "{0}\{1}\{2}" -f $tmpFolder, $folderName, $fileNameStrings
     $pathInfoPlist = "{0}\{1}\{2}" -f $tmpFolder, $folderName, $fileNameInfoPlist
 
-    "Downloading to $folderName..."
+    "Downloading $fileNameStrings and $fileNameInfoPlist to $folderName..."
     Invoke-WebRequest -Uri $urlStrings -OutFile $pathStrings
     Invoke-WebRequest -Uri $urlInfoPlist -OutFile $pathInfoPlist
+
+    "Removing Loco comments from $pathStrings..."
+    Get-Content $pathStrings | Where-Object { $_ -notmatch "^  Exported at" -and $_ -notmatch "^  Exported by" } | Set-Content $pathStrings
+
+    "Removing Loco comments from $pathInfoPlist..."
+    Get-Content $pathInfoPlist | Where-Object { $_ -notmatch "^  Exported at" -and $_ -notmatch "^  Exported by" } | Set-Content $pathInfoPlist
 }
 
 function DownloadResxs([String] $tmpFolder, [String] $locoExportKey, [String[]] $langs){    
