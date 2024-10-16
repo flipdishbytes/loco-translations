@@ -2,7 +2,7 @@
 
 This custom GitHub Action was created to integrate Loco Translations into your CI/CD pipeline. It allows you to download translations from `https://localise.biz` and create/update PR with translated files.
 
-# Github Action: Loco Translations `flipdishbytes/loco-translations@v1.0`
+# Github Action: Loco Translations `flipdishbytes/loco-translations@v1.1`
 
 To use this Datadog CI action, add it to your pipeline workflow YAML file. Here are examples of adding traces to the pipeline depending on your needs.
 
@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Translations Loco
-        uses: flipdishbytes/loco-translations@v1.0
+        uses: flipdishbytes/loco-translations@v1.1
         with:
           locoExportKey: ${{ secrets.LOCOEXPORTKEY }} # https://localise.biz -> Project -> Developer tools -> Export key from your Loco project. Set LOCOEXPORTKEY secret in your GitHub Actions.
           #mainBranch: main # it's main by default. Set it to your repository default branch if it's needed. Not required.
@@ -52,10 +52,12 @@ jobs:
           #     resx (for .NET projects),
           #     json (for Android and other projects using json language files),
           #     lproj (for iOS projects).
-          translationsFolder: 'src/DotNET.Translations' #the folder where yout translation files are located.
+          translationsFolder: 'src/DotNET.Translations' # the folder where yout translation files are located.
           GH_TOKEN: ${{ github.token }} # leave it like that of you don't need to assign PR to teams for review.
           #GH_TOKEN: ${{ secrets.GH_TOKEN }} # use this if you need to assign PR to teams.
           #reviewer: 'flipdishbytes/delivery-enablement-team' # You have to set GH_TOKEN to your PAT if you want to add teams as revievers. Use comma if you need more than one team.
+          #draft: false # false by default.
+          #automerge: false # false by default. Use to enable auto merge after necessary requirements are met. Can't be used with draft set to true. Make sure you enabled pull request Auto merge for your repository.
 ```
 
 ### GitHub Actions PAT for assigning PRs to teams.

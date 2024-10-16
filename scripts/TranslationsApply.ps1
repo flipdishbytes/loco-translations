@@ -1,7 +1,7 @@
 $tmpFolder = $env:tmpFolder
 $targetFolder = $env:targetFolder
 
-if (($targetFolder.Length -eq 0) -or ($tmpFolder.Length -eq 0)) {
+if (([string]::IsNullOrEmpty($targetFolder)) -or ([string]::IsNullOrEmpty($tmpFolder))) {
     Write-Error "Folders are not set."
     exit 1
 }
