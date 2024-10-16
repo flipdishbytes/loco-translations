@@ -44,8 +44,8 @@ jobs:
       - name: Translations Loco
         uses: flipdishbytes/loco-translations@v1.2
         with:
-          app-id: ${{ vars.LOCO_APP_ID }} # No need to change this.
-          private-key: ${{ secrets.LOCO_PRIVATE_KEY }} # No need to change this.
+          app-id: ${{ vars.LOCO_APP_ID }} # No need to change/set this in your repository. LOCO_APP_ID variable is set globally in all Flipdish repos.
+          private-key: ${{ secrets.LOCO_PRIVATE_KEY }} # No need to change/set this in your repository. LOCO_PRIVATE_KEY secret is set globally in all Flipdish repos.
           locoExportKey: ${{ secrets.LOCOEXPORTKEY }} # https://localise.biz -> Project -> Developer tools -> Export key from your Loco project. Set LOCOEXPORTKEY secret in your GitHub Actions.
           #mainBranch: main # it's main by default. Set it to your repository default branch if it's needed. Not required.
           langs: 'en,bg,de,es,fr,it,nl,pl,pt,fi' #language tags should match Loco languages from the project
