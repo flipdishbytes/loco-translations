@@ -31,6 +31,10 @@ inputs:
     description: 'Automerge PR'
     required: false
     default: 'false'
+  review:
+    description: 'Auto approval of PR'
+    required: false
+    default: 'false'
 
 runs:
   using: "composite"
@@ -103,4 +107,5 @@ runs:
         reviewer: ${{ inputs.reviewer }}
         draft: ${{inputs.draft}}
         automerge: ${{inputs.automerge}}
+        review: ${{inputs.review}}
       shell: pwsh
