@@ -52,10 +52,12 @@ jobs:
           #     resx (for .NET projects),
           #     json (for Android and other projects using json language files),
           #     lproj (for iOS projects).
-          translationsFolder: 'src/DotNET.Translations' #the folder where yout translation files are located.
+          translationsFolder: 'src/DotNET.Translations' # the folder where yout translation files are located.
           GH_TOKEN: ${{ github.token }} # leave it like that of you don't need to assign PR to teams for review.
           #GH_TOKEN: ${{ secrets.GH_TOKEN }} # use this if you need to assign PR to teams.
           #reviewer: 'flipdishbytes/delivery-enablement-team' # You have to set GH_TOKEN to your PAT if you want to add teams as revievers. Use comma if you need more than one team.
+          #draft: false # false by default.
+          #automerge: false # false by default. Use to enable auto merge after necessary requirements are met
 ```
 
 ### GitHub Actions PAT for assigning PRs to teams.
