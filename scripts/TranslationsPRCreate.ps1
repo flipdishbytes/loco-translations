@@ -36,8 +36,8 @@ if ($createPullRequest -eq 'true') {
         gh pr merge $pullRequestCreated --auto --delete-branch --squash
     }
 
-    if ($env:review -eq "true") {
-        gh pr review $pullRequestCreated --approve --body "Approved by GitHub Actions to update translations files."
-    }
+    # if ($env:review -eq "true") {
+    #     gh pr review $pullRequestCreated --approve --body "Approved by GitHub Actions to update translations files."
+    # }
 
 }
