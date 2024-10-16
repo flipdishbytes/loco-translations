@@ -31,11 +31,9 @@ inputs:
   app-id:
     description: 'GitHub App ID'
     required: true
-    default: ${{ vars.LOCO_APP_ID }}
   private-key:
     description: 'GitHub App Private Key'
     required: true
-    default: ${{ secrets.LOCO_PRIVATE_KEY }}
 
 runs:
   using: "composite"
