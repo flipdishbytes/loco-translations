@@ -130,7 +130,7 @@ runs:
 
     - name: Cleanup
       if: always()
-      run: ${{ github.workspace }}
+      run: ${{ github.action_path }}/scripts/FolderCleanup.ps1
       env:
-        folderPath: ${{ steps.pr_check.outputs.sourceBranch }}
+        folderPath: ${{ github.workspace }}
       shell: pwsh
