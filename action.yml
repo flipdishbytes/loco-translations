@@ -23,6 +23,14 @@ inputs:
   reviewer:
     description: 'Reviewer for the PR'
     required: false
+  draft:
+    description: 'Create PR as draft'
+    required: false
+    default: 'false'
+  automerge:
+    description: 'Automerge PR'
+    required: false
+    default: 'false'
 
 runs:
   using: "composite"
@@ -93,4 +101,6 @@ runs:
         repositoryId: ${{ github.repository }}
         GH_TOKEN: ${{ inputs.GH_TOKEN }}
         reviewer: ${{ inputs.reviewer }}
+        draft: ${{inputs.draft}}
+        automerge: ${{inputs.automerge}}
       shell: pwsh

@@ -15,15 +15,25 @@ if ($createPullRequest -eq 'true') {
     Write-Host "Pull Request title:" $pullRequestTitle
     Write-Host "Translations Branch:" $translationsBranch
     Write-Host "Source Branch:" $sourceBranch
+
+    $command = "gh pr create --title '$pullRequestTitle' --head $translationsBranch --base $sourceBranch --repo $repositoryUri --body 'This PR is created by GitHub Actions to update translations files.'"
     
-    if ($env:reviewer.Length -eq 0) {
-        $pullRequestCreated = gh pr create --title $pullRequestTitle --head $translationsBranch --base $sourceBranch --repo $repositoryUri --body "This PR is created by GitHub Actions to update translations files."
+    if (-not [string]::IsNullOrEmpty($env:reviewer)) {
+        $command += " --reviewer $env:reviewer"
     }
-    else {
-        $pullRequestCreated = gh pr create --title $pullRequestTitle --head $translationsBranch --base $sourceBranch --repo $repositoryUri --body "This PR is created by GitHub Actions to update translations files." --reviewer $env:reviewer
+
+    if ($env:draft -eq "true") {
+        $command += " --draft"
     }
+    
+    $pullRequestCreated = Invoke-Expression $command
     
     if ($debugInfo -eq 'true') {
-        Write-Host "Pull Request Created:"($pullRequestCreated | ConvertTo-Json -Depth 1)
+        Write-Host "Pull Request Created:" $pullRequestCreated
     }
+
+    if ($env:automerge -eq "true") {
+        gh pr merge $pullRequestCreated --auto
+    }
+
 }

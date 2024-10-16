@@ -5,7 +5,7 @@
 ###Set working firectory to source code
 
 function CreateTmpFolder([String] $tmpFolder){
-    if ($tmpFolder.Length -eq 0) {
+    if ([string]::IsNullOrEmpty($tmpFolder)) {
         $tmpFolder = "tmp"
     }
     
