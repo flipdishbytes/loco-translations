@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Translations Loco
-        uses: flipdishbytes/loco-translations@v1.1
+        uses: flipdishbytes/loco-translations@v1.2
         with:
           locoExportKey: ${{ secrets.LOCOEXPORTKEY }} # https://localise.biz -> Project -> Developer tools -> Export key from your Loco project. Set LOCOEXPORTKEY secret in your GitHub Actions.
           #mainBranch: main # it's main by default. Set it to your repository default branch if it's needed. Not required.
@@ -53,11 +53,9 @@ jobs:
           #     json (for Android and other projects using json language files),
           #     lproj (for iOS projects).
           translationsFolder: 'src/DotNET.Translations' # the folder where yout translation files are located.
-          GH_TOKEN: ${{ github.token }} # leave it like that of you don't need to assign PR to teams for review.
-          #GH_TOKEN: ${{ secrets.GH_TOKEN }} # use this if you need to assign PR to teams.
-          #reviewer: 'flipdishbytes/delivery-enablement-team' # You have to set GH_TOKEN to your PAT if you want to add teams as revievers. Use comma if you need more than one team.
-          #draft: false # false by default.
+          #reviewer: 'flipdishbytes/delivery-enablement-team' #Use comma if you need more than one team.
           #automerge: false # false by default. Use to enable auto merge after necessary requirements are met. Can't be used with draft set to true. Make sure you enabled pull request Auto merge for your repository.
+          #draft: false # false by default.
 ```
 
 ### GitHub Actions PAT for assigning PRs to teams.

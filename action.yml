@@ -13,9 +13,6 @@ inputs:
   translationsFolder:
     description: 'Folder to store translations'
     required: true
-  GH_TOKEN:
-    description: 'GitHub Token'
-    required: true
   mainBranch:
     description: 'Main branch'
     required: false
@@ -35,13 +32,32 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - uses: actions/create-github-app-token@v1
+      id: app-token
+      with:
+        app-id: ${{ vars.LOCO_APP_ID }}
+        private-key: ${{ secrets.LOCO_PRIVATE_KEY }}
+    
+    - name: Get GitHub App User ID
+      id: get-user-id
+      run: echo "user-id=$(gh api "/users/${{ steps.app-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
+      shell: bash
+      env:
+        GH_TOKEN: ${{ steps.app-token.outputs.token }}
+
+    - name: Configure GitHub App User ID
+      run: |
+        git config --global user.name '${{ steps.app-token.outputs.app-slug }}[bot]'
+        git config --global user.email '${{ steps.get-user-id.outputs.user-id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com>'
+      shell: bash
+
     - name: Translations PR Check
       id: pr_check
       run: ${{ github.action_path }}/scripts/TranslationsPRCheck.ps1
       env:
         mainBranch: ${{ inputs.mainBranch }}
         repositoryId: ${{ github.repository }}
-        GH_TOKEN: ${{ inputs.GH_TOKEN }}
+        GH_TOKEN: ${{ steps.app-token.outputs.token }}
       shell: pwsh
     
     - name: Checkout to existing translations branch
@@ -49,13 +65,15 @@ runs:
       uses: actions/checkout@v4
       with:
         ref: ${{ steps.pr_check.outputs.translationsBranch }}
+        token: ${{ steps.app-token.outputs.token }}
     
     - name: Checkout to the main branch
       if : ${{ steps.pr_check.outputs.createPullRequest == 'true' }}
       uses: actions/checkout@v4
       with:
         ref: ${{ steps.pr_check.outputs.sourceBranch }}
-    
+        token: ${{ steps.app-token.outputs.token }}
+
     - name: Checkout to new translations branch
       if : ${{ steps.pr_check.outputs.createPullRequest == 'true' }}
       run: git checkout -b $translationsBranch
@@ -87,7 +105,7 @@ runs:
         sourceBranch: ${{ steps.pr_check.outputs.sourceBranch }}
         translationsBranch: ${{ steps.pr_check.outputs.translationsBranch }}
         changesDetected: ${{ steps.translations_check.outputs.changesDetected }}
-        GH_TOKEN: ${{ inputs.GH_TOKEN }}
+        GH_TOKEN: ${{ steps.app-token.outputs.token }}
       shell: pwsh
       
     - name: Translations PR Create
@@ -97,10 +115,16 @@ runs:
         sourceBranch: ${{ steps.pr_check.outputs.sourceBranch }}
         translationsBranch: ${{ steps.pr_check.outputs.translationsBranch }}
         createPullRequest: ${{ steps.pr_check.outputs.createPullRequest }}
-      # reviewer: 'flipdishbytes/delivery-enablement-team'
         repositoryId: ${{ github.repository }}
-        GH_TOKEN: ${{ inputs.GH_TOKEN }}
+        GH_TOKEN: ${{ steps.app-token.outputs.token }}
         reviewer: ${{ inputs.reviewer }}
         draft: ${{inputs.draft}}
         automerge: ${{inputs.automerge}}
+      shell: pwsh
+
+    - name: Cleanup
+      if: always()
+      run: ${{ github.workspace }}
+      env:
+        folderPath: ${{ steps.pr_check.outputs.sourceBranch }}
       shell: pwsh
