@@ -57,7 +57,7 @@ jobs:
           #GH_TOKEN: ${{ secrets.GH_TOKEN }} # use this if you need to assign PR to teams.
           #reviewer: 'flipdishbytes/delivery-enablement-team' # You have to set GH_TOKEN to your PAT if you want to add teams as revievers. Use comma if you need more than one team.
           #draft: false # false by default.
-          #automerge: false # false by default. Use to enable auto merge after necessary requirements are met. Can't be used with draft set to true.
+          #automerge: false # false by default. Use to enable auto merge after necessary requirements are met. Can't be used with draft set to true. Make sure you enabled pull request Auto merge for your repository.
 ```
 
 ### GitHub Actions PAT for assigning PRs to teams.
