@@ -33,7 +33,7 @@ if ($createPullRequest -eq 'true') {
     }
 
     if ($env:automerge -eq "true") {
-        gh pr merge $pullRequestCreated --auto --delete-branch
+        gh pr merge $pullRequestCreated --auto --delete-branch --squash
     }
 
 }
