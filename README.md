@@ -59,10 +59,3 @@ jobs:
           #automerge: false # false by default. Use to enable auto merge after necessary requirements are met. Can't be used with draft set to true. Make sure you enabled pull request Auto merge for your repository.
           #draft: false # false by default.
 ```
-
-### GitHub Actions PAT for assigning PRs to teams.
-❗ Required only to assign PRs review to teams. GitHub actions internal PAT doesn't have access to read groups. No need to do this if you are not going to assign your PRs to teams.
-1. Go to `https://github.com/settings/personal-access-tokens`
-2. Create Fine-grained token based on the example
-![GitHub Actions PAT Example](GitHubActionsPAT.png)
-3. Add `GH_TOKEN` secret to your GitHub Actions repo.
