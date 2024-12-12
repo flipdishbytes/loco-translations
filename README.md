@@ -2,7 +2,7 @@
 
 This custom GitHub Action was created to integrate Loco Translations into your CI/CD pipeline. It allows you to download translations from `https://localise.biz` and create/update PR with translated files.
 
-# Github Action: Loco Translations `flipdishbytes/loco-translations@v1.1`
+# Github Action: Loco Translations `flipdishbytes/loco-translations@v1.3`
 
 To use this Datadog CI action, add it to your pipeline workflow YAML file. Here are examples of adding traces to the pipeline depending on your needs.
 
@@ -18,7 +18,7 @@ To use this Datadog CI action, add it to your pipeline workflow YAML file. Here 
 
 ### How to use?
 
-❗ Make sure you enabled `Automatically delete head branches ` in yout GitHub repository so after pull requests are merged, you can have head branches deleted automatically.
+❗ Make sure you enabled `Automatically delete head branches ` in your GitHub repository so after pull requests are merged, you can have head branches deleted automatically.
 
 ```yaml
 name: GH Action workflow to download and apply Loco Translations
@@ -26,9 +26,9 @@ name: GH Action workflow to download and apply Loco Translations
 on:
   # allow to run manually
   workflow_dispatch:
-  # run on schedule every 3 hours at 0 minutes
+  # run on schedule every 8 hours at 0 minutes
   schedule:
-    - cron: "0 */3 * * *"
+    - cron: "0 */8 * * *"
 
 permissions: 
   id-token: write
@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Translations Loco
-        uses: flipdishbytes/loco-translations@v1.2
+        uses: flipdishbytes/loco-translations@v1.3
         with:
           app-id: ${{ vars.LOCO_APP_ID }} # No need to change/set this in your repository. LOCO_APP_ID variable is set globally in all Flipdish repos.
           private-key: ${{ secrets.LOCO_PRIVATE_KEY }} # No need to change/set this in your repository. LOCO_PRIVATE_KEY secret is set globally in all Flipdish repos.
@@ -55,6 +55,8 @@ jobs:
           #     json (for Android and other projects using json language files),
           #     lproj (for iOS projects).
           translationsFolder: 'src/DotNET.Translations' # the folder where yout translation files are located.
+          #filesExtension: 'strings.json' # will rename default extensions by this custom one ### supported by json format only
+          #languagePostfixInNames: true # will rename files to be 'de_DE' and etc (except the en language) ### supported by json format only
           #reviewer: 'flipdishbytes/delivery-enablement-team' #Use comma if you need more than one team.
           #automerge: false # false by default. Use to enable auto merge after necessary requirements are met. Can't be used with draft set to true. Make sure you enabled pull request Auto merge for your repository.
           #draft: false # false by default.
