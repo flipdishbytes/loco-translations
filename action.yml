@@ -10,6 +10,13 @@ inputs:
   format:
     description: 'Format of the translations'
     required: true
+  filesExtension:
+    description: 'Files extension'
+    required: false
+  languagePostfixInNames:
+    description: 'Postfix in language names'
+    required: false
+    default: 'false'
   translationsFolder:
     description: 'Folder to store translations'
     required: true
@@ -94,6 +101,8 @@ runs:
         tmpFolder: ${{ runner.temp }}/tmp_translations
         langs: ${{ inputs.langs }}
         format: ${{ inputs.format }}
+        filesExtension: ${{ inputs.filesExtension }}
+        languagePostfixInNames: ${{ inputs.languagePostfixInNames }}
       shell: pwsh
       
     - name: Translations Apply
