@@ -39,11 +39,10 @@ function DownloadResx([String] $tmpFolder,[String] $lang,[String] $locoExportKey
 function DownloadJson([String] $tmpFolder,[String] $lang,[String] $locoExportKey){
     $url = "https://localise.biz/api/export/locale/{0}.json?status=translated&key={1}" -f $lang, $locoExportKey
 
-    $languagePostfixInNamesLength = $env:languagePostfixInNames.Length
     $filesExtensionLength = $env:filesExtension.Length
 
     if ($filesExtensionLength -gt 0) { $fileExtension = $env:filesExtension } else { $fileExtension = "json" }
-    if (($languagePostfixInNamesLength -gt 0) -and ($lang -ne "en")) {
+    if (($env:languagePostfixInNames -eq "true") -and ($lang -ne "en")) {
         $langToUpperCase = $lang.ToUpper()
         $fileName = "{0}_{1}.{2}" -f $lang, $langToUpperCase, $fileExtension
     } else {
