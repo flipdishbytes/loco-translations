@@ -62,4 +62,5 @@ jobs:
           #automerge: false # false by default. Use to enable auto merge after necessary requirements are met. Can't be used with draft set to true. Make sure you enabled pull request Auto merge for your repository.
           #draft: false # false by default.
           #skip_pr_create: false # false by default. Used for monorepos when there are more than one steps for loco translations being called. All steps except the last one should set this to false.
+          #use_current_loco_branch: true # false by default. Use to use the current branch in Loco for translations.
 ```

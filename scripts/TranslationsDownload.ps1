@@ -77,6 +77,16 @@ function DownloadXML([String] $tmpFolder,[String] $lang,[String] $locoExportKey)
     Write-Host $path
     Remove-Item $path
     Rename-Item -Path $tmppath -NewName $fileName
+
+    if ($lang -eq "en") {
+        if (!(Test-Path "$tmpFolder/values")) {
+            New-Item -ItemType Directory -Path "$tmpFolder/values"
+            Write-Host "Creating $tmpFolder/values..."
+        }
+        "Copying to $tmpFolder/values..."
+        $path = "{0}\{1}\{2}" -f $tmpFolder, "values", $fileName
+        Copy-Item -Path "$tmpFolder\values-$lang\$fileName" -Destination "$tmpFolder\values\$fileName"
+    }
 }
 
 function DownloadLproj([String] $tmpFolder,[String] $lang,[String] $locoExportKey){
