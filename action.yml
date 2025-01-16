@@ -28,7 +28,11 @@ inputs:
     description: 'Reviewer for the PR'
     required: false
   skip_pr_create:
-    description: 'Do not create PR'
+    description: 'Do not create PR (monorepo support)'
+    required: false
+    default: 'false'
+  use_current_loco_branch:
+    description: 'Use loco branch created by previous run (monorepo support)'
     required: false
     default: 'false'
   draft:
@@ -92,8 +96,15 @@ runs:
         token: ${{ steps.app-token.outputs.token }}
 
     - name: Checkout to new translations branch
-      if : ${{ steps.pr_check.outputs.createPullRequest == 'true' }}
+      if : ${{ inputs.use_current_loco_branch != 'true' && steps.pr_check.outputs.createPullRequest == 'true' }}
       run: git checkout -b $translationsBranch
+      env:
+        translationsBranch: ${{ steps.pr_check.outputs.translationsBranch }}
+      shell: bash
+    
+    - name: Checkout to the current translations branch
+      if : ${{ inputs.use_current_loco_branch == 'true' && steps.pr_check.outputs.createPullRequest == 'true' }}
+      run: git checkout -b $translationsBranch && git pull origin $translationsBranch
       env:
         translationsBranch: ${{ steps.pr_check.outputs.translationsBranch }}
       shell: bash
