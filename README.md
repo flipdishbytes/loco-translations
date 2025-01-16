@@ -51,13 +51,16 @@ jobs:
           langs: 'en,bg,de,es,fr,it,nl,pl,pt,fi' #language tags should match Loco languages from the project
           format: 'resx'
           # supported formats: 
-          #     resx (for .NET projects),
-          #     json (for Android and other projects using json language files),
-          #     lproj (for iOS projects).
-          translationsFolder: 'src/DotNET.Translations' # the folder where yout translation files are located.
+          #     resx (for .NET projects)
+          #     json (for projects using json language files)
+          #     lproj (for iOS projects)
+          #     xml (for Android projects)
+          translationsFolder: 'src/DotNET.Translations' # the folder where your translation files are located.
           #filesExtension: 'strings.json' # will rename default extensions by this custom one ### supported by json format only
           #languagePostfixInNames: true # will rename files to be 'de_DE' and etc (except the en language) ### supported by json format only
           #reviewer: 'flipdishbytes/delivery-enablement-team' #Use comma if you need more than one team.
           #automerge: false # false by default. Use to enable auto merge after necessary requirements are met. Can't be used with draft set to true. Make sure you enabled pull request Auto merge for your repository.
           #draft: false # false by default.
+          #skip_pr_create: false # false by default. Used for monorepos when there are more than one steps for loco translations being called. All steps except the last one should set this to false.
+          #use_current_loco_branch: true # false by default. Use to use the current branch in Loco for translations.
 ```

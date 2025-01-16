@@ -27,6 +27,14 @@ inputs:
   reviewer:
     description: 'Reviewer for the PR'
     required: false
+  skip_pr_create:
+    description: 'Do not create PR (monorepo support)'
+    required: false
+    default: 'false'
+  use_current_loco_branch:
+    description: 'Use loco branch created by previous run (monorepo support)'
+    required: false
+    default: 'false'
   draft:
     description: 'Create PR as draft'
     required: false
@@ -88,8 +96,15 @@ runs:
         token: ${{ steps.app-token.outputs.token }}
 
     - name: Checkout to new translations branch
-      if : ${{ steps.pr_check.outputs.createPullRequest == 'true' }}
+      if : ${{ inputs.use_current_loco_branch != 'true' && steps.pr_check.outputs.createPullRequest == 'true' }}
       run: git checkout -b $translationsBranch
+      env:
+        translationsBranch: ${{ steps.pr_check.outputs.translationsBranch }}
+      shell: bash
+    
+    - name: Checkout to the current translations branch
+      if : ${{ inputs.use_current_loco_branch == 'true' && steps.pr_check.outputs.createPullRequest == 'true' }}
+      run: git checkout -b $translationsBranch && git pull origin $translationsBranch
       env:
         translationsBranch: ${{ steps.pr_check.outputs.translationsBranch }}
       shell: bash
@@ -124,7 +139,7 @@ runs:
       shell: pwsh
       
     - name: Translations PR Create
-      if : ${{ steps.pr_check.outputs.createPullRequest == 'true' && steps.translations_check.outputs.changesDetected == 'true' }}
+      if : ${{ inputs.skip_pr_create != 'true' && steps.pr_check.outputs.createPullRequest == 'true' && steps.translations_check.outputs.changesDetected == 'true' }}
       run: ${{ github.action_path }}/scripts/TranslationsPRCreate.ps1
       env:
         sourceBranch: ${{ steps.pr_check.outputs.sourceBranch }}
@@ -133,8 +148,8 @@ runs:
         repositoryId: ${{ github.repository }}
         GH_TOKEN: ${{ steps.app-token.outputs.token }}
         reviewer: ${{ inputs.reviewer }}
-        draft: ${{inputs.draft}}
-        automerge: ${{inputs.automerge}}
+        draft: ${{ inputs.draft }}
+        automerge: ${{ inputs.automerge }}
       shell: pwsh
 
     - name: Cleanup

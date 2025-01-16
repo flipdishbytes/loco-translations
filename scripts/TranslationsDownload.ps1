@@ -2,7 +2,7 @@
 ###Add environment variable: langs - 'en,uk-UA' as example
 ###Add environment variable: tmpFolder - 'tmp' by default
 ###Add environment variable: format
-###Set working firectory to source code
+###Set working directory to source code
 
 function CreateTmpFolder([String] $tmpFolder){
     if ([string]::IsNullOrEmpty($tmpFolder)) {
@@ -16,7 +16,6 @@ function CreateTmpFolder([String] $tmpFolder){
     Write-Host "Creating $tmpFolder..."
     New-Item -ItemType Directory -Path "$tmpFolder" 
 }
-
 
 function DownloadResx([String] $tmpFolder,[String] $lang,[String] $locoExportKey){
     $url = "https://localise.biz/api/export/locale/{0}.resx?status=translated&key={1}" -f $lang, $locoExportKey
@@ -37,7 +36,7 @@ function DownloadResx([String] $tmpFolder,[String] $lang,[String] $locoExportKey
 }
 
 function DownloadJson([String] $tmpFolder,[String] $lang,[String] $locoExportKey){
-    $url = "https://localise.biz/api/export/locale/{0}.json?status=translated&key={1}" -f $lang, $locoExportKey
+    $url = "https://localise.biz/api/export/locale/{0}.json?status=translated&key={1}&no-folding=true" -f $lang, $locoExportKey
 
     $filesExtensionLength = $env:filesExtension.Length
 
@@ -53,6 +52,41 @@ function DownloadJson([String] $tmpFolder,[String] $lang,[String] $locoExportKey
 
     "Downloading to $path..."
     Invoke-WebRequest -Uri $url -OutFile $path
+}
+function DownloadXML([String] $tmpFolder,[String] $lang,[String] $locoExportKey){
+    $url = "https://localise.biz/api/export/locale/{0}.xml?status=translated&key={1}&format=android" -f $lang, $locoExportKey
+
+    $fileFolder = "values-" + $lang
+    $fileName = "strings.xml"
+
+    Write-Host "Downloading translations for xml"
+    #make sure the folder exists before downloading, create it if it doesn't
+    if (!(Test-Path "$tmpFolder/$fileFolder")) {
+        New-Item -ItemType Directory -Path "$tmpFolder/$fileFolder"
+        Write-Host "Creating $tmpFolder/$fileFolder..."
+    }
+
+    $path = "{0}\{1}\{2}" -f $tmpFolder, $fileFolder, $fileName
+
+    "Downloading to $path..."
+    Invoke-WebRequest -Uri $url -OutFile $path
+
+    $tmppath = $path + ".tmp"
+    "Removing Loco comments from $path"
+    Get-Content $path | Where-Object { $_ -notmatch "^ Exported at:" } | Where-Object { $_ -notmatch "^ Exported by:" } | Set-Content $tmppath
+    Write-Host $path
+    Remove-Item $path
+    Rename-Item -Path $tmppath -NewName $fileName
+
+    if ($lang -eq "en") {
+        if (!(Test-Path "$tmpFolder/values")) {
+            New-Item -ItemType Directory -Path "$tmpFolder/values"
+            Write-Host "Creating $tmpFolder/values..."
+        }
+        "Copying to $tmpFolder/values..."
+        $path = "{0}\{1}\{2}" -f $tmpFolder, "values", $fileName
+        Copy-Item -Path "$tmpFolder\values-$lang\$fileName" -Destination "$tmpFolder\values\$fileName"
+    }
 }
 
 function DownloadLproj([String] $tmpFolder,[String] $lang,[String] $locoExportKey){
@@ -92,6 +126,13 @@ function DownloadJsons([String] $tmpFolder, [String] $locoExportKey, [String[]] 
     }
 }
 
+function DownloadXMLs([String] $tmpFolder, [String] $locoExportKey, [String[]] $langs){    
+    Foreach ($lang in $langs)
+    {
+        DownloadXML $tmpFolder $lang $locoExportKey
+    }
+}
+
 function DownloadLprojs([String] $tmpFolder, [String] $locoExportKey, [String[]] $langs){    
     Foreach ($lang in $langs)
     {
@@ -103,7 +144,6 @@ $tmpFolder = $env:tmpFolder
 CreateTmpFolder $tmpFolder
 
 $langs = $env:langs -split ","
-Write-Host "Downloading translations for $langs..."
 
 $format = $env:format
 $filesExtension = $env:filesExtension
@@ -111,13 +151,20 @@ $languagePostfixInNames = $env:languagePostfixInNames
 
 switch ($format) {
     "resx" {
+        Write-Host "Downloading translations for $langs..."
         DownloadResxs $tmpFolder $env:locoExportKey $langs
     }
     "json" {
+        Write-Host "Downloading translations for $langs..."
         DownloadJsons $tmpFolder $env:locoExportKey $langs
     }
     "lproj" {
+        Write-Host "Downloading translations for $langs..."
         DownloadLprojs $tmpFolder $env:locoExportKey $langs
+    }
+    "xml" {
+        Write-Host "Downloading translations for $langs..."
+        DownloadXMLs $tmpFolder $env:locoExportKey $langs
     }
     default {
         Write-Host "Unsupported format: $format"
