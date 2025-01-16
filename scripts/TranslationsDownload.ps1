@@ -36,7 +36,7 @@ function DownloadResx([String] $tmpFolder,[String] $lang,[String] $locoExportKey
 }
 
 function DownloadJson([String] $tmpFolder,[String] $lang,[String] $locoExportKey){
-    $url = "https://localise.biz/api/export/locale/{0}.json?status=translated&key={1}" -f $lang, $locoExportKey
+    $url = "https://localise.biz/api/export/locale/{0}.json?status=translated&key={1}&no-folding=true" -f $lang, $locoExportKey
 
     $filesExtensionLength = $env:filesExtension.Length
 
