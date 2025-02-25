@@ -2,6 +2,7 @@
 ###Add environment variable: langs - 'en,uk-UA' as example
 ###Add environment variable: tmpFolder - 'tmp' by default
 ###Add environment variable: format
+###Add environment variable: noFolding - 'true' or 'false'
 ###Set working directory to source code
 
 function CreateTmpFolder([String] $tmpFolder){
@@ -35,8 +36,12 @@ function DownloadResx([String] $tmpFolder,[String] $lang,[String] $locoExportKey
     Rename-Item -Path $tmppath -NewName $fileName
 }
 
-function DownloadJson([String] $tmpFolder,[String] $lang,[String] $locoExportKey){
-    $url = "https://localise.biz/api/export/locale/{0}.json?status=translated&key={1}&no-folding=true" -f $lang, $locoExportKey
+function DownloadJson([String] $tmpFolder,[String] $lang,[String] $locoExportKey, [String]$noFolding){
+    if ($noFolding -eq 'true') {
+        $url = "https://localise.biz/api/export/locale/{0}.json?status=translated&key={1}&no-folding=true" -f $lang, $locoExportKey
+    } else {
+        $url = "https://localise.biz/api/export/locale/{0}.json?status=translated&key={1}" -f $lang, $locoExportKey
+    }
 
     $filesExtensionLength = $env:filesExtension.Length
 
@@ -119,10 +124,10 @@ function DownloadResxs([String] $tmpFolder, [String] $locoExportKey, [String[]] 
     }
 }
 
-function DownloadJsons([String] $tmpFolder, [String] $locoExportKey, [String[]] $langs){    
+function DownloadJsons([String] $tmpFolder, [String] $locoExportKey, [String[]] $langs, [String] $noFolding){    
     Foreach ($lang in $langs)
     {
-        DownloadJson $tmpFolder $lang $locoExportKey
+        DownloadJson $tmpFolder $lang $locoExportKey $noFolding
     }
 }
 
@@ -144,7 +149,7 @@ $tmpFolder = $env:tmpFolder
 CreateTmpFolder $tmpFolder
 
 $langs = $env:langs -split ","
-
+$noFolding = $env:nofolding
 $format = $env:format
 $filesExtension = $env:filesExtension
 $languagePostfixInNames = $env:languagePostfixInNames
@@ -156,7 +161,7 @@ switch ($format) {
     }
     "json" {
         Write-Host "Downloading translations for $langs..."
-        DownloadJsons $tmpFolder $env:locoExportKey $langs
+        DownloadJsons $tmpFolder $env:locoExportKey $langs $noFolding
     }
     "lproj" {
         Write-Host "Downloading translations for $langs..."

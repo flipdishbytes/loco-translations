@@ -55,6 +55,7 @@ jobs:
           #     json (for projects using json language files)
           #     lproj (for iOS projects)
           #     xml (for Android projects)
+          # nofolding: 'true' # supported only by json formats
           translationsFolder: 'src/DotNET.Translations' # the folder where your translation files are located.
           #filesExtension: 'strings.json' # will rename default extensions by this custom one ### supported by json format only
           #languagePostfixInNames: true # will rename files to be 'de_DE' and etc (except the en language) ### supported by json format only

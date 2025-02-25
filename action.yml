@@ -10,6 +10,10 @@ inputs:
   format:
     description: 'Format of the translations'
     required: true
+  nofolding:
+    description: 'Do not fold the translations'
+    required: false
+    default: 'false'
   filesExtension:
     description: 'Files extension'
     required: false
@@ -116,6 +120,7 @@ runs:
         tmpFolder: ${{ runner.temp }}/tmp_translations
         langs: ${{ inputs.langs }}
         format: ${{ inputs.format }}
+        nofolding: ${{ inputs.nofolding }}
         filesExtension: ${{ inputs.filesExtension }}
         languagePostfixInNames: ${{ inputs.languagePostfixInNames }}
       shell: pwsh
