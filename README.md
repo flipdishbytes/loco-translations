@@ -56,7 +56,7 @@ jobs:
           #     lproj (for iOS projects)
           #     xml (for Android projects)
           # nofolding: 'true' # supported only by json formats
-          convert: true # supported only by json formats. Converts json from '{"Start_Date":"2023-01-01"}' to format '{"Start_Date":{"value":"2023-01-01"}}' so you don't need to add .value to Loco
+          # convert: true # supported only by json formats. Converts json from '{"Start_Date":"2023-01-01"}' to format '{"Start_Date":{"value":"2023-01-01"}}' so you don't need to add .value to Loco
           translationsFolder: 'src/DotNET.Translations' # the folder where your translation files are located.
           #filesExtension: 'strings.json' # will rename default extensions by this custom one ### supported by json format only
           #languagePostfixInNames: true # will rename files to be 'de_DE' and etc (except the en language) ### supported by json format only
