@@ -3,7 +3,14 @@
 ###Add environment variable: tmpFolder - 'tmp' by default
 ###Add environment variable: format
 ###Add environment variable: noFolding - 'true' or 'false'
+###Add environment variable: convert - 'true' or 'false'
 ###Set working directory to source code
+
+$env:locoExportKey = "mvqn1lliUxVrL3llFaUYf5vEwkhBIyp0"
+$env:langs = "en"
+$env:tmpFolder = "tmp"
+$env:format = "json"
+$env:filesExtension = "json"
 
 function CreateTmpFolder([String] $tmpFolder){
     if ([string]::IsNullOrEmpty($tmpFolder)) {
@@ -56,7 +63,22 @@ function DownloadJson([String] $tmpFolder,[String] $lang,[String] $locoExportKey
     $path = "{0}\{1}" -f $tmpFolder, $fileName
 
     "Downloading to $path..."
-    Invoke-WebRequest -Uri $url -OutFile $path
+    $response = Invoke-WebRequest -Uri $url -UseBasicParsing | Select-Object -ExpandProperty Content
+
+    if ($env:convert -eq "true") {
+        Write-Host "Converting JSON output..."
+        $jsonObject = $response | ConvertFrom-Json -AsHashTable
+
+        $transformedJson = @{}
+        foreach ($key in $jsonObject.Keys) {
+            $transformedJson[$key] = @{ value = $jsonObject[$key] }
+        }
+
+        $finalJson = $transformedJson | ConvertTo-Json -Depth 10
+        $finalJson | Out-File -Encoding utf8 $path
+    } else {
+        $response | Out-File -Encoding utf8 $path
+    }
 }
 function DownloadXML([String] $tmpFolder,[String] $lang,[String] $locoExportKey){
     $url = "https://localise.biz/api/export/locale/{0}.xml?status=translated&key={1}&format=android" -f $lang, $locoExportKey

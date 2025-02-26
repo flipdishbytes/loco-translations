@@ -11,7 +11,11 @@ inputs:
     description: 'Format of the translations'
     required: true
   nofolding:
-    description: 'Do not fold the translations'
+    description: 'Do not fold the JSON translations'
+    required: false
+    default: 'false'
+  convert:
+    description: 'Convert the JSON translations to value format'
     required: false
     default: 'false'
   filesExtension:
@@ -121,6 +125,7 @@ runs:
         langs: ${{ inputs.langs }}
         format: ${{ inputs.format }}
         nofolding: ${{ inputs.nofolding }}
+        convert: ${{ inputs.convert }}
         filesExtension: ${{ inputs.filesExtension }}
         languagePostfixInNames: ${{ inputs.languagePostfixInNames }}
       shell: pwsh
