@@ -63,8 +63,9 @@ function DownloadJson([String] $tmpFolder,[String] $lang,[String] $locoExportKey
         Write-Host "Converting JSON output..."
         $jsonObject = $response | ConvertFrom-Json -AsHashTable
 
+        $sortedKeys = $jsonObject.Keys | Sort-Object
         $transformedJson = @{}
-        foreach ($key in $jsonObject.Keys) {
+        foreach ($key in $sortedKeys) {
             $transformedJson[$key] = @{ value = $jsonObject[$key] }
         }
 
