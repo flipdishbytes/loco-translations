@@ -6,12 +6,6 @@
 ###Add environment variable: convert - 'true' or 'false'
 ###Set working directory to source code
 
-$env:locoExportKey = "mvqn1lliUxVrL3llFaUYf5vEwkhBIyp0"
-$env:langs = "en"
-$env:tmpFolder = "tmp"
-$env:format = "json"
-$env:filesExtension = "json"
-
 function CreateTmpFolder([String] $tmpFolder){
     if ([string]::IsNullOrEmpty($tmpFolder)) {
         $tmpFolder = "tmp"
