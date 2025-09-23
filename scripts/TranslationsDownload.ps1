@@ -71,7 +71,7 @@ function DownloadJson([String] $tmpFolder, [String] $lang, [String] $locoExportK
         foreach ($match in $keyValueMatches) {
             $key = $match.Groups[1].Value
             $value = $match.Groups[2].Value
-            $jsonParts += "`"$key`": { `"value`": `"$value`" }"
+            $jsonParts += "`"$key`": {" + [Environment]::NewLine + "    `"value`": `"$value`"" + [Environment]::NewLine + "  }"
         }
         $finalJson = "{" + [Environment]::NewLine + "  " + ($jsonParts -join ("," + [Environment]::NewLine + "  ")) + [Environment]::NewLine + "}"
         $finalJson | Out-File -Encoding utf8 $path
