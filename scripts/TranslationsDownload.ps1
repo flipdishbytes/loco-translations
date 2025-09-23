@@ -66,13 +66,14 @@ function DownloadJson([String] $tmpFolder, [String] $lang, [String] $locoExportK
         # Extract keys and values from original JSON string to preserve case-sensitive keys
         $keyValueMatches = [regex]::Matches($response, '"([^"]+)":\s*"([^"]*)"')
         
-        $transformedJson = [ordered]@{}
+        # Build JSON string manually to avoid any PowerShell JSON conversion issues
+        $jsonParts = @()
         foreach ($match in $keyValueMatches) {
             $key = $match.Groups[1].Value
             $value = $match.Groups[2].Value
-            $transformedJson[$key] = @{ value = $value }
+            $jsonParts += "`"$key`": { `"value`": `"$value`" }"
         }
-        $finalJson = $transformedJson | ConvertTo-Json -Depth 10
+        $finalJson = "{ " + ($jsonParts -join ", ") + " }"
         $finalJson | Out-File -Encoding utf8 $path
     }
     else {
