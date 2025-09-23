@@ -73,7 +73,7 @@ function DownloadJson([String] $tmpFolder, [String] $lang, [String] $locoExportK
             $value = $match.Groups[2].Value
             $jsonParts += "`"$key`": { `"value`": `"$value`" }"
         }
-        $finalJson = "{ " + ($jsonParts -join ", ") + " }"
+        $finalJson = "{" + [Environment]::NewLine + "  " + ($jsonParts -join ("," + [Environment]::NewLine + "  ")) + [Environment]::NewLine + "}"
         $finalJson | Out-File -Encoding utf8 $path
     }
     else {
