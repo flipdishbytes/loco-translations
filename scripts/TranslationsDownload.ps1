@@ -61,13 +61,16 @@ function DownloadJson([String] $tmpFolder,[String] $lang,[String] $locoExportKey
 
     if ($env:convert -eq "true") {
         Write-Host "Formatting and sorting JSON output..."
-        $jsonObject = $response | ConvertFrom-Json
+        Add-Type -AssemblyName System.Web.Extensions
+        $jsSerializer = New-Object System.Web.Script.Serialization.JavaScriptSerializer
+        $jsonObject = $jsSerializer.DeserializeObject($response)
+        
         $transformedJson = [ordered]@{}
         
-        # Get all property names and sort them
-        $sortedKeys = $jsonObject.PSObject.Properties.Name | Sort-Object
+        # Sort keys while preserving case sensitivity
+        $sortedKeys = $jsonObject.Keys | Sort-Object
         foreach ($key in $sortedKeys) {
-            $transformedJson[$key] = @{ value = $jsonObject.$key }
+            $transformedJson[$key] = @{ value = $jsonObject[$key] }
         }
         
         $finalJson = $transformedJson | ConvertTo-Json -Depth 10
