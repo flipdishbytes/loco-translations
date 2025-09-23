@@ -64,7 +64,8 @@ function DownloadJson([String] $tmpFolder, [String] $lang, [String] $locoExportK
     if ($env:convert -eq "true") {
         Write-Host "Formatting and sorting JSON output..."
         # Extract keys and values from original JSON string to preserve case-sensitive keys
-        $keyValueMatches = [regex]::Matches($response, '"([^"]+)":\s*"([^"]*)"')
+        # Use regex that handles escaped quotes in values
+        $keyValueMatches = [regex]::Matches($response, '"([^"]+)":\s*"((?:[^"\\]|\\.)*)"')
         
         # Build JSON string manually to avoid any PowerShell JSON conversion issues
         $jsonParts = @()
