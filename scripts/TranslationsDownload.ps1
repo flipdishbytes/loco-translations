@@ -6,7 +6,7 @@
 ###Add environment variable: convert - 'true' or 'false'
 ###Set working directory to source code
 
-function CreateTmpFolder([String] $tmpFolder){
+function CreateTmpFolder([String] $tmpFolder) {
     if ([string]::IsNullOrEmpty($tmpFolder)) {
         $tmpFolder = "tmp"
     }
@@ -19,10 +19,10 @@ function CreateTmpFolder([String] $tmpFolder){
     New-Item -ItemType Directory -Path "$tmpFolder" 
 }
 
-function DownloadResx([String] $tmpFolder,[String] $lang,[String] $locoExportKey){
+function DownloadResx([String] $tmpFolder, [String] $lang, [String] $locoExportKey) {
     $url = "https://localise.biz/api/export/locale/{0}.resx?status=translated&key={1}" -f $lang, $locoExportKey
 
-    if($lang -eq "en") { $fileName = "Resources.resx" } else { $fileName = "Resources.{0}.resx" -f $lang }
+    if ($lang -eq "en") { $fileName = "Resources.resx" } else { $fileName = "Resources.{0}.resx" -f $lang }
 
     $path = "{0}\{1}" -f $tmpFolder, $fileName
 
@@ -37,10 +37,11 @@ function DownloadResx([String] $tmpFolder,[String] $lang,[String] $locoExportKey
     Rename-Item -Path $tmppath -NewName $fileName
 }
 
-function DownloadJson([String] $tmpFolder,[String] $lang,[String] $locoExportKey, [String]$noFolding){
+function DownloadJson([String] $tmpFolder, [String] $lang, [String] $locoExportKey, [String]$noFolding) {
     if ($noFolding -eq 'true') {
         $url = "https://localise.biz/api/export/locale/{0}.json?status=translated&key={1}&no-folding=true" -f $lang, $locoExportKey
-    } else {
+    }
+    else {
         $url = "https://localise.biz/api/export/locale/{0}.json?status=translated&key={1}" -f $lang, $locoExportKey
     }
 
@@ -50,7 +51,8 @@ function DownloadJson([String] $tmpFolder,[String] $lang,[String] $locoExportKey
     if (($env:languagePostfixInNames -eq "true") -and ($lang -ne "en")) {
         $langToUpperCase = $lang.ToUpper()
         $fileName = "{0}_{1}.{2}" -f $lang, $langToUpperCase, $fileExtension
-    } else {
+    }
+    else {
         $fileName = "{0}.{1}" -f $lang, $fileExtension
     }
 
@@ -61,25 +63,23 @@ function DownloadJson([String] $tmpFolder,[String] $lang,[String] $locoExportKey
 
     if ($env:convert -eq "true") {
         Write-Host "Formatting and sorting JSON output..."
-        Add-Type -AssemblyName System.Web.Extensions
-        $jsSerializer = New-Object System.Web.Script.Serialization.JavaScriptSerializer
-        $jsonObject = $jsSerializer.DeserializeObject($response)
+        # Extract keys and values from original JSON string to preserve case-sensitive keys
+        $keyValueMatches = [regex]::Matches($response, '"([^"]+)":\s*"([^"]*)"')
         
         $transformedJson = [ordered]@{}
-        
-        # Sort keys while preserving case sensitivity
-        $sortedKeys = $jsonObject.Keys | Sort-Object
-        foreach ($key in $sortedKeys) {
-            $transformedJson[$key] = @{ value = $jsonObject[$key] }
+        foreach ($match in $keyValueMatches) {
+            $key = $match.Groups[1].Value
+            $value = $match.Groups[2].Value
+            $transformedJson[$key] = @{ value = $value }
         }
-        
         $finalJson = $transformedJson | ConvertTo-Json -Depth 10
         $finalJson | Out-File -Encoding utf8 $path
-    } else {
+    }
+    else {
         $response | Out-File -Encoding utf8 $path
     }
 }
-function DownloadXML([String] $tmpFolder,[String] $lang,[String] $locoExportKey){
+function DownloadXML([String] $tmpFolder, [String] $lang, [String] $locoExportKey) {
     $url = "https://localise.biz/api/export/locale/{0}.xml?status=translated&key={1}&format=android" -f $lang, $locoExportKey
 
     $fileFolder = "values-" + $lang
@@ -115,7 +115,7 @@ function DownloadXML([String] $tmpFolder,[String] $lang,[String] $locoExportKey)
     }
 }
 
-function DownloadLproj([String] $tmpFolder,[String] $lang,[String] $locoExportKey){
+function DownloadLproj([String] $tmpFolder, [String] $lang, [String] $locoExportKey) {
     $folderName = "{0}.lproj" -f $lang
 
     if (!(Test-Path "$tmpFolder/$folderName")) {
@@ -138,30 +138,26 @@ function DownloadLproj([String] $tmpFolder,[String] $lang,[String] $locoExportKe
     Invoke-WebRequest -Uri $urlInfoPlist -OutFile $pathInfoPlist
 }
 
-function DownloadResxs([String] $tmpFolder, [String] $locoExportKey, [String[]] $langs){    
-    Foreach ($lang in $langs)
-    {
+function DownloadResxs([String] $tmpFolder, [String] $locoExportKey, [String[]] $langs) {    
+    Foreach ($lang in $langs) {
         DownloadResx $tmpFolder $lang $locoExportKey
     }
 }
 
-function DownloadJsons([String] $tmpFolder, [String] $locoExportKey, [String[]] $langs, [String] $noFolding){    
-    Foreach ($lang in $langs)
-    {
+function DownloadJsons([String] $tmpFolder, [String] $locoExportKey, [String[]] $langs, [String] $noFolding) {    
+    Foreach ($lang in $langs) {
         DownloadJson $tmpFolder $lang $locoExportKey $noFolding
     }
 }
 
-function DownloadXMLs([String] $tmpFolder, [String] $locoExportKey, [String[]] $langs){    
-    Foreach ($lang in $langs)
-    {
+function DownloadXMLs([String] $tmpFolder, [String] $locoExportKey, [String[]] $langs) {    
+    Foreach ($lang in $langs) {
         DownloadXML $tmpFolder $lang $locoExportKey
     }
 }
 
-function DownloadLprojs([String] $tmpFolder, [String] $locoExportKey, [String[]] $langs){    
-    Foreach ($lang in $langs)
-    {
+function DownloadLprojs([String] $tmpFolder, [String] $locoExportKey, [String[]] $langs) {    
+    Foreach ($lang in $langs) {
         DownloadLproj $tmpFolder $lang $locoExportKey
     }
 }
