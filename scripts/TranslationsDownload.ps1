@@ -61,11 +61,15 @@ function DownloadJson([String] $tmpFolder,[String] $lang,[String] $locoExportKey
 
     if ($env:convert -eq "true") {
         Write-Host "Formatting and sorting JSON output..."
-        $jsonObject = $response | ConvertFrom-Json -AsHashTable
+        $jsonObject = $response | ConvertFrom-Json
         $transformedJson = [ordered]@{}
-        foreach ($key in ($jsonObject.Keys | Sort-Object)) {
-            $transformedJson[$key] = @{ value = $jsonObject[$key] }
+        
+        # Get all property names and sort them
+        $sortedKeys = $jsonObject.PSObject.Properties.Name | Sort-Object
+        foreach ($key in $sortedKeys) {
+            $transformedJson[$key] = @{ value = $jsonObject.$key }
         }
+        
         $finalJson = $transformedJson | ConvertTo-Json -Depth 10
         $finalJson | Out-File -Encoding utf8 $path
     } else {
