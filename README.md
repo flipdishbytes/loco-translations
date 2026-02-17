@@ -2,7 +2,7 @@
 
 This custom GitHub Action was created to integrate Loco Translations into your CI/CD pipeline. It allows you to download translations from `https://localise.biz` and create/update PR with translated files.
 
-# Github Action: Loco Translations `flipdishbytes/loco-translations@v1.3`
+# Github Action: Loco Translations `flipdishbytes/loco-translations@v1.7`
 
 To use this Datadog CI action, add it to your pipeline workflow YAML file. Here are examples of adding traces to the pipeline depending on your needs.
 
@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Translations Loco
-        uses: flipdishbytes/loco-translations@v1.3
+        uses: flipdishbytes/loco-translations@v1.7
         with:
           app-id: ${{ vars.LOCO_APP_ID }} # No need to change/set this in your repository. LOCO_APP_ID variable is set globally in all Flipdish repos.
           private-key: ${{ secrets.LOCO_PRIVATE_KEY }} # No need to change/set this in your repository. LOCO_PRIVATE_KEY secret is set globally in all Flipdish repos.
