@@ -33,7 +33,7 @@ The action chooses the mode automatically:
 ❗ Enable **Automatically delete head branches** in the repo so the Loco branch is deleted after the PR is merged.
 
 ```yaml
-name: Loco Translations (export)
+name: flipdishbytes.serverless-app-template.translations-export
 
 on:
   workflow_dispatch:
@@ -70,7 +70,7 @@ jobs:
 Use `format: json` and set **`convert: 'true'`** if you also run the **import** workflow: export will write the value format `{"key":{"value":"..."}}`, which matches what import expects. `convert` is supported only for JSON.
 
 ```yaml
-name: Loco Translations (export)
+name: flipdishbytes.serverless-app-template.translations-export
 
 on:
   workflow_dispatch:
@@ -132,7 +132,7 @@ Use this on push to `main` when your source translation file changes, so Loco ge
 Set `LOCOWRITEKEY` in your repository secrets (Loco → Project → Developer tools → full-access/write key).
 
 ```yaml
-name: Loco Translations (import)
+name: flipdishbytes.serverless-app-template.translations-import
 
 on:
   workflow_dispatch:
