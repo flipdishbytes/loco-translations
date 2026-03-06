@@ -1,68 +1,151 @@
 # Purpose
 
-This custom GitHub Action was created to integrate Loco Translations into your CI/CD pipeline. It allows you to download translations from `https://localise.biz` and create/update PR with translated files.
+This custom GitHub Action integrates Loco Translations (`https://localise.biz`) into your CI/CD pipeline. It supports two modes:
 
-# Github Action: Loco Translations `flipdishbytes/loco-translations@v1.7`
+- **Export mode**: Download translations from Loco and create/update a Pull Request with the changed files.
+- **Import mode**: Upload a local JSON translation file (e.g. `en.json`) to Loco so that all keys from the file exist in your Loco project. Use this on push/merge to main to keep Loco in sync with your source of truth.
 
-To use this Datadog CI action, add it to your pipeline workflow YAML file. Here are examples of adding traces to the pipeline depending on your needs.
+# Github Action: Loco Translations `flipdishbytes/loco-translations@v1.8`
 
-### How it works?
+## Modes
 
-1. Checks if there is a Pull Request opened with the `[LANG] Loco updates` title in the beginning.
-    1. If there is any, it gets the latest one and reads base and target branches for this PR to reuse them.
-    2. If there is no PR opened, it will generate a branch name based on the current date `loco_updates_{YYYY_MM_DD}` and will create a PR in the end.
-2. Downloads translations from Loco based on the `langs` array and `format`. Set the `LOCOEXPORTKEY` secret in your GitHub Actions.
-3. Applies downloaded translation files (overwrite) to the `translationsFolder` folder.
-4. Checks if there are any changes based on `git status` and pushes them to the translations branch from step 1.
+The action chooses the mode automatically:
+
+- **Import mode** when `locoWriteKey` is set **and** `format` is `json`: check out the repo and import `translationsFolder/<lang>.json` into Loco (use a single language in `langs`; no GitHub App or PR involved). If `format` is not `json`, import is skipped and the action runs as export.
+- **Export mode** otherwise: use `locoExportKey` and the GitHub App to download from Loco, apply files, push to a branch, and create/update a PR.
+
+---
+
+## Export mode (download from Loco, create PR)
+
+### How it works
+
+1. Checks if there is a Pull Request open with the title starting with `[LANG] Loco updates`.
+   - If yes, reuses its base and head branches.
+   - If no, creates a branch `loco_updates_{YYYY_MM_DD}` and will create a PR at the end.
+2. Downloads translations from Loco using `langs` and `format`. Set the `LOCOEXPORTKEY` secret.
+3. Applies the downloaded files into `translationsFolder`.
+4. If there are changes, commits and pushes to the translations branch.
 5. Creates a PR if there is none yet.
 
-### How to use?
+### Example (export)
 
-❗ Make sure you enabled `Automatically delete head branches ` in your GitHub repository so after pull requests are merged, you can have head branches deleted automatically.
+❗ Enable **Automatically delete head branches** in the repo so the Loco branch is deleted after the PR is merged.
 
 ```yaml
-name: GH Action workflow to download and apply Loco Translations
+name: Loco Translations (export)
 
 on:
-  # allow to run manually
   workflow_dispatch:
-  # run on schedule every 8 hours at 0 minutes
   schedule:
     - cron: "0 */8 * * *"
 
-permissions: 
+permissions:
   id-token: write
-  contents: write # must be set
-  pull-requests: write # must be set
-
+  contents: write
+  pull-requests: write
 
 jobs:
-  deploy:
+  loco-export:
     runs-on: ubuntu-latest
-
     steps:
       - name: Translations Loco
-        uses: flipdishbytes/loco-translations@v1.7
+        uses: flipdishbytes/loco-translations@v1.8
         with:
-          app-id: ${{ vars.LOCO_APP_ID }} # No need to change/set this in your repository. LOCO_APP_ID variable is set globally in all Flipdish repos.
-          private-key: ${{ secrets.LOCO_PRIVATE_KEY }} # No need to change/set this in your repository. LOCO_PRIVATE_KEY secret is set globally in all Flipdish repos.
-          locoExportKey: ${{ secrets.LOCOEXPORTKEY }} # https://localise.biz -> Project -> Developer tools -> Export key from your Loco project. Set LOCOEXPORTKEY secret in your GitHub Actions.
-          #mainBranch: main # it's main by default. Set it to your repository default branch if it's needed. Not required.
-          langs: 'en,bg,de,es,fr,it,nl,pl,pt,fi' #language tags should match Loco languages from the project
+          app-id: ${{ vars.LOCO_APP_ID }}
+          private-key: ${{ secrets.LOCO_PRIVATE_KEY }}
+          locoExportKey: ${{ secrets.LOCOEXPORTKEY }}
+          # mainBranch: main
+          langs: 'en,bg,de,es,fr,it,nl,pl,pt,fi'
           format: 'resx'
-          # supported formats: 
-          #     resx (for .NET projects)
-          #     json (for projects using json language files)
-          #     lproj (for iOS projects)
-          #     xml (for Android projects)
-          # nofolding: 'true' # supported only by json formats
-          # convert: true # supported only by json formats. Converts json from '{"Start_Date":"2023-01-01"}' to format '{"Start_Date":{"value":"2023-01-01"}}' so you don't need to add .value to Loco
-          translationsFolder: 'src/DotNET.Translations' # the folder where your translation files are located.
-          #filesExtension: 'strings.json' # will rename default extensions by this custom one ### supported by json format only
-          #languagePostfixInNames: true # will rename files to be 'de_DE' and etc (except the en language) ### supported by json format only
-          #reviewer: 'flipdishbytes/delivery-enablement-team' #Use comma if you need more than one team.
-          #automerge: false # false by default. Use to enable auto merge after necessary requirements are met. Can't be used with draft set to true. Make sure you enabled pull request Auto merge for your repository.
-          #draft: false # false by default.
-          #skip_pr_create: false # false by default. Used for monorepos when there are more than one steps for loco translations being called. All steps except the last one should set this to false.
-          #use_current_loco_branch: true # false by default. Use to use the current branch in Loco for translations.
+          # format: resx | json | lproj | xml
+          # nofolding: 'true'   # json only
+          # convert: 'true'     # json only: {"key":{"value":"..."}}
+          translationsFolder: 'src/DotNET.Translations'
+          # filesExtension: 'strings.json'   # json only
+          # languagePostfixInNames: true      # json only
+          # reviewer: 'flipdishbytes/delivery-enablement-team'
+          # automerge: false
+          # draft: false
+          # skip_pr_create: false
+          # use_current_loco_branch: true
 ```
+
+---
+
+## Import mode (upload JSON to Loco)
+
+### How it works
+
+1. Checks out the repository.
+2. Reads the JSON file at `translationsFolder/<lang>.json` (e.g. `localization/en.json` when `translationsFolder` is `localization` and `langs` is `en`). **Import requires `format: 'json'** and **exactly one language in `langs`.**
+3. Sends it to Loco’s import API with `ignore-existing=true`, so only **new** keys are added; existing assets are not updated.
+
+Use this on push to `main` when your source translation file changes, so Loco gets new keys from your codebase. You can restrict the workflow to run only when that file changes using `paths`.
+
+### Example (import when translation file changes)
+
+Set `LOCOWRITEKEY` in your repository secrets (Loco → Project → Developer tools → full-access/write key).
+
+```yaml
+name: Loco Translations (import)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    # Run only when the translation file changes; update path(s) to match your repo
+    paths:
+      - 'localization/en.json'
+
+permissions:
+  id-token: write
+  contents: write
+
+concurrency:
+  group: main_translations
+
+jobs:
+  loco-import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add tags to pipeline traces
+        uses: flipdishbytes/datadog-ci@v1.2
+        with:
+          COMMAND: 'tag --level pipeline --tags service:serverless-app-template --tags team:platform-enablement-team --tags env:production'
+      - name: Translations Loco
+        uses: flipdishbytes/loco-translations@v1.8
+        with:
+          locoWriteKey: ${{ secrets.LOCOWRITEKEY }}
+          format: 'json'
+          langs: 'en'
+          # Folder containing <lang>.json; update if your file is elsewhere (e.g. packages/frontend/src/localization)
+          translationsFolder: 'localization'
+```
+
+The JSON file can be flat `{"key": "value"}` or value-wrapped `{"key": {"value": "..."}}`; both are supported.
+
+---
+
+## Inputs reference
+
+| Input | Export | Import | Description |
+|-------|--------|--------|-------------|
+| `locoExportKey` | ✅ Required | — | Loco export key. |
+| `locoWriteKey` | — | ✅ Required | Loco write key (import mode). |
+| `langs` | ✅ Required | ✅ Required (exactly one) | Comma-separated for export; single language for import (e.g. `en`). |
+| `format` | ✅ Required | ✅ Required (`json` only) | Export: `resx` \| `json` \| `lproj` \| `xml`. Import runs only when `json`. |
+| `translationsFolder` | ✅ Required | ✅ Required | Folder for translation files (export: write here; import: read `<lang>.json` from here). |
+| `app-id` | ✅ Required | — | GitHub App ID (export only). |
+| `private-key` | ✅ Required | — | GitHub App private key (export only). |
+| `mainBranch` | Optional | — | Default `main`. |
+| `nofolding` | Optional | — | JSON only, default `false`. |
+| `convert` | Optional | — | JSON only, default `false`. |
+| `filesExtension` | Optional | — | JSON only. |
+| `languagePostfixInNames` | Optional | — | JSON only, default `false`. |
+| `reviewer` | Optional | — | PR reviewer. |
+| `skip_pr_create` | Optional | — | Default `false` (monorepo). |
+| `use_current_loco_branch` | Optional | — | Default `false`. |
+| `draft` | Optional | — | Create PR as draft. |
+| `automerge` | Optional | — | Automerge PR. |
