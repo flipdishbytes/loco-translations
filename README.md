@@ -28,7 +28,7 @@ The action chooses the mode automatically:
 4. If there are changes, commits and pushes to the translations branch.
 5. Creates a PR if there is none yet.
 
-### Example (export)
+### Example (export, RESX)
 
 ❗ Enable **Automatically delete head branches** in the repo so the Loco branch is deleted after the PR is merged.
 
@@ -59,16 +59,45 @@ jobs:
           langs: 'en,bg,de,es,fr,it,nl,pl,pt,fi'
           format: 'resx'
           # format: resx | json | lproj | xml
-          # nofolding: 'true'   # json only
-          # convert: 'true'     # json only: {"key":{"value":"..."}}
           translationsFolder: 'src/DotNET.Translations'
-          # filesExtension: 'strings.json'   # json only
-          # languagePostfixInNames: true      # json only
           # reviewer: 'flipdishbytes/delivery-enablement-team'
           # automerge: false
           # draft: false
-          # skip_pr_create: false
-          # use_current_loco_branch: true
+```
+
+### Example (export, JSON)
+
+Use `format: json` and set **`convert: 'true'`** if you also run the **import** workflow: export will write the value format `{"key":{"value":"..."}}`, which matches what import expects. `convert` is supported only for JSON.
+
+```yaml
+name: Loco Translations (export)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 */8 * * *"
+
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+
+jobs:
+  loco-export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Translations Loco
+        uses: flipdishbytes/loco-translations@v1.8
+        with:
+          app-id: ${{ vars.LOCO_APP_ID }} # No need to change/set this in your repository. LOCO_APP_ID variable is set globally.
+          private-key: ${{ secrets.LOCO_PRIVATE_KEY }} # No need to change/set this in your repository. LOCO_PRIVATE_KEY secret is set globally.
+          locoExportKey: ${{ secrets.LOCOEXPORTKEY }} # https://localise.biz → Project → Developer Tools → Export the read-only key from your Loco project. Set LOCOEXPORTKEY in your GitHub repository secrets (/settings/secrets/actions).
+          langs: 'en,en-US,de,es-MX,es,fr,it,nl,pt' # language tags should match Loco languages from the project
+          format: json
+          convert: 'true' # JSON only. Required for import workflow compatibility: exports as {"key":{"value":"..."}} so import can read the same files. Use 'false' to export flat JSON (not compatible with import).
+          translationsFolder: localization
+          mainBranch: main
+          automerge: true
 ```
 
 ---
@@ -81,7 +110,7 @@ jobs:
 2. Reads the JSON file at `translationsFolder/<lang>.json` (e.g. `localization/en.json` when `translationsFolder` is `localization` and `langs` is `en`). **Import requires `format: 'json'** and **exactly one language in `langs`.**
 3. Sends it to Loco’s import API with `ignore-existing=true`, so only **new** keys are added; existing assets are not updated.
 
-Use this on push to `main` when your source translation file changes, so Loco gets new keys from your codebase. You can restrict the workflow to run only when that file changes using `paths`.
+Use this on push to `main` when your source translation file changes, so Loco gets new keys from your codebase. You can restrict the workflow to run only when that file changes using `paths`. If you also use **export** with JSON, set **`convert: 'true'`** in the export workflow so exported files use the same value format (`{"key":{"value":"..."}}`) that import supports.
 
 ### Example (import when translation file changes)
 
@@ -141,7 +170,7 @@ The JSON file can be flat `{"key": "value"}` or value-wrapped `{"key": {"value":
 | `private-key` | ✅ Required | — | GitHub App private key (export only). |
 | `mainBranch` | Optional | — | Default `main`. |
 | `nofolding` | Optional | — | JSON only, default `false`. |
-| `convert` | Optional | — | JSON only, default `false`. |
+| `convert` | Optional | — | **JSON only.** Set to `true` for import workflow compatibility (exports `{"key":{"value":"..."}}`; import expects this format). Default `false`. |
 | `filesExtension` | Optional | — | JSON only. |
 | `languagePostfixInNames` | Optional | — | JSON only, default `false`. |
 | `reviewer` | Optional | — | PR reviewer. |
