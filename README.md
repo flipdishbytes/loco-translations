@@ -104,6 +104,21 @@ jobs:
 
 ## Import mode (upload JSON to Loco)
 
+**Only JSON format is supported for import.** Use the same structure in your JSON files as in the template below.
+
+### Requirements
+
+1. **JSON format only** — Import runs only when `format` is `json`.
+2. **Use the value format in your JSON files** — Match the template format so export and import stay in sync. Example:
+   ```json
+   "About_Test": {
+       "value": "About Test"
+   },
+   ```
+   Import accepts both flat `{"key": "value"}` and value-wrapped `{"key": {"value": "..."}}`, but the value format is required for compatibility with export when using `convert: 'true'`.
+3. **Do not use `.value` in Loco strings** — In Loco, store the plain translation (e.g. `About Test`), not IDs or text that include `.value`. If you already have `.value` in Loco, you can run the **export** pipeline manually: it will add all strings from `en.json` and generate translations, which also helps repopulate or fix the Loco project.
+4. **Filling a Loco project from JSON** — You can use the import workflow (or a one-off import) to seed a new or empty Loco project from your `en.json` file.
+
 ### How it works
 
 1. Checks out the repository.
@@ -153,7 +168,7 @@ jobs:
           translationsFolder: 'localization'
 ```
 
-The JSON file can be flat `{"key": "value"}` or value-wrapped `{"key": {"value": "..."}}`; both are supported.
+Use the value format in your JSON (see **Requirements** above). The action also accepts flat `{"key": "value"}` for import, but the value format is required for export/import compatibility.
 
 ---
 
