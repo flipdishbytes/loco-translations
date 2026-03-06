@@ -115,7 +115,7 @@ jobs:
        "value": "About Test"
    },
    ```
-   Import accepts both flat `{"key": "value"}` and value-wrapped `{"key": {"value": "..."}}`, but the value format is required for compatibility with export when using `convert: 'true'`.
+   The JSON files in your repo **must** use this value format. The action can read both flat and value-wrapped when importing to Loco, but the canonical format in the repo must be `{"key": {"value": "..."}}` for compatibility with import-from-Loco when using `convert: 'true'`.
 3. **Do not use `.value` in Loco strings** — In Loco, store the plain translation (e.g. `About Test`), not IDs or text that include `.value`. If you already have `.value` in Loco, you can run the **export** pipeline manually: it will add all strings from `en.json` and generate translations, which also helps repopulate or fix the Loco project.
 4. **Filling a Loco project from JSON** — You can use the import workflow (or a one-off import) to seed a new or empty Loco project from your `en.json` file.
 
@@ -168,7 +168,7 @@ jobs:
           translationsFolder: 'localization'
 ```
 
-Use the value format in your JSON (see **Requirements** above). The action also accepts flat `{"key": "value"}` for import, but the value format is required for export/import compatibility.
+The JSON format in your repo must be the value format `{"key": {"value": "..."}}` (see **Requirements** above). The action supports reading both flat and value-wrapped when exporting to Loco, but the repo files must use the value format.
 
 ---
 
