@@ -74,21 +74,27 @@ runs:
         fi
       shell: bash
 
+    - name: Validate export inputs
+      if: steps.mode.outputs.mode == 'export'
+      run: |
+        missing=""
+        [ -z "${{ inputs.locoExportKey }}" ] && missing="$missing locoExportKey"
+        [ -z "${{ inputs.app-id }}" ] && missing="$missing app-id"
+        [ -z "${{ inputs.private-key }}" ] && missing="$missing private-key"
+        [ -z "${{ inputs.format }}" ] && missing="$missing format"
+        if [ -n "$missing" ]; then
+          echo "Export mode requires: locoExportKey, app-id, private-key, and format. Missing:$missing"
+          echo "To import to Loco instead (no app-id or private-key needed), set locoWriteKey and format: 'json'."
+          exit 1
+        fi
+      shell: bash
+
     - uses: actions/create-github-app-token@v1
       if: steps.mode.outputs.mode == 'export'
       id: app-token
       with:
         app-id: ${{ inputs.app-id }}
         private-key: ${{ inputs.private-key }}
-
-    - name: Validate export inputs
-      if: steps.mode.outputs.mode == 'export'
-      run: |
-        if [ -z "${{ inputs.locoExportKey }}" ] || [ -z "${{ inputs.app-id }}" ] || [ -z "${{ inputs.private-key }}" ] || [ -z "${{ inputs.format }}" ]; then
-          echo "Export mode requires locoExportKey, app-id, private-key, and format."
-          exit 1
-        fi
-      shell: bash
 
     - name: Validate import inputs
       if: steps.mode.outputs.mode == 'import'
