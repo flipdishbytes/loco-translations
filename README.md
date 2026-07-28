@@ -5,7 +5,7 @@ This custom GitHub Action integrates Loco Translations (`https://localise.biz`) 
 - **Export mode**: Download translations from Loco and create/update a Pull Request with the changed files.
 - **Import mode**: Upload a local JSON translation file (e.g. `en.json`) to Loco so that all keys from the file exist in your Loco project. Use this on push/merge to main to keep Loco in sync with your source of truth.
 
-# Github Action: Loco Translations `flipdishbytes/loco-translations@v1.8`
+# Github Action: Loco Translations `flipdishbytes/loco-translations@v1.9`
 
 ## Modes
 
@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Translations Loco
-        uses: flipdishbytes/loco-translations@v1.8
+        uses: flipdishbytes/loco-translations@v1.9
         with:
           app-id: ${{ vars.LOCO_APP_ID }}
           private-key: ${{ secrets.LOCO_PRIVATE_KEY }}
@@ -87,7 +87,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Translations Loco
-        uses: flipdishbytes/loco-translations@v1.8
+        uses: flipdishbytes/loco-translations@v1.9
         with:
           app-id: ${{ vars.LOCO_APP_ID }} # No need to change/set this in your repository. LOCO_APP_ID variable is set globally.
           private-key: ${{ secrets.LOCO_PRIVATE_KEY }} # No need to change/set this in your repository. LOCO_PRIVATE_KEY secret is set globally.
@@ -159,7 +159,7 @@ jobs:
         with:
           COMMAND: 'tag --level pipeline --tags service:serverless-app-template --tags team:platform-enablement-team --tags env:production'
       - name: Translations Loco
-        uses: flipdishbytes/loco-translations@v1.8
+        uses: flipdishbytes/loco-translations@v1.9
         with:
           locoWriteKey: ${{ secrets.LOCOWRITEKEY }}
           format: 'json'

@@ -31,17 +31,22 @@ if (-not (Test-Path -LiteralPath $sourceFile -PathType Leaf)) {
 Write-Host "Seeding translations from $sourceFile to Loco (locale: $lang)..."
 
 $raw = Get-Content -LiteralPath $sourceFile -Raw -Encoding utf8
-$data = $raw | ConvertFrom-Json
+# PSCustomObject properties are case-insensitive, but JSON and Loco asset IDs
+# are case-sensitive. Use hashtables so keys such as "Example_Key" and
+# "Example_key" can coexist.
+$data = $raw | ConvertFrom-Json -AsHashtable
 
 # Build flat key -> value for API. Support both:
 #   - Value format:  { "key": { "value": "..." } }
 #   - Flat format:   { "key": "..." }
-$seedData = @{}
-foreach ($entry in $data.PSObject.Properties) {
-    $key = $entry.Name
+$seedData = [System.Collections.Generic.Dictionary[string, object]]::new(
+    [System.StringComparer]::Ordinal
+)
+foreach ($entry in $data.GetEnumerator()) {
+    $key = $entry.Key
     $val = $entry.Value
-    if ($val -is [System.Management.Automation.PSCustomObject] -and $null -ne $val.PSObject.Properties['value']) {
-        $seedData[$key] = $val.value
+    if ($val -is [System.Collections.IDictionary] -and $val.Contains('value')) {
+        $seedData[$key] = $val['value']
     } elseif ($val -is [string]) {
         $seedData[$key] = $val
     } else {
