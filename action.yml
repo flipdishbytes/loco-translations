@@ -21,6 +21,10 @@ inputs:
     description: 'Convert the JSON translations to value format'
     required: false
     default: 'false'
+  caseSensetive:
+    description: 'Preserve JSON translation keys that differ only by casing during import'
+    required: false
+    default: 'false'
   filesExtension:
     description: 'Files extension'
     required: false
@@ -127,6 +131,7 @@ runs:
         locoWriteKey: ${{ inputs.locoWriteKey }}
         lang: ${{ steps.validate_import.outputs.lang }}
         sourceFile: ${{ github.workspace }}/${{ inputs.translationsFolder }}/${{ steps.validate_import.outputs.lang }}.json
+        caseSensetive: ${{ inputs.caseSensetive }}
       shell: pwsh
 
     - name: Get GitHub App User ID

@@ -127,6 +127,8 @@ jobs:
 
 Use this on push to `main` when your source translation file changes, so Loco gets new keys from your codebase. You can restrict the workflow to run only when that file changes using `paths`. If you also use **export** with JSON, set **`convert: 'true'`** in the export workflow so exported files use the same value format (`{"key":{"value":"..."}}`) that import supports.
 
+Import uses the original case-insensitive JSON conversion by default. Set `caseSensetive: 'true'` only for catalogs that contain distinct keys differing only by casing, such as `Bank_Account` and `Bank_account`.
+
 ### Example (import when translation file changes)
 
 Set `LOCOWRITEKEY` in your repository secrets (Loco → Project → Developer tools → full-access/write key).
@@ -166,6 +168,8 @@ jobs:
           langs: 'en'
           # Folder containing <lang>.json; update if your file is elsewhere (e.g. packages/frontend/src/localization)
           translationsFolder: 'localization'
+          # Preserve distinct keys that differ only by casing; default is false
+          # caseSensetive: 'true'
 ```
 
 The JSON format in your repo must be the value format `{"key": {"value": "..."}}` (see **Requirements** above). The action supports reading both flat and value-wrapped when exporting to Loco, but the repo files must use the value format.
@@ -186,6 +190,7 @@ The JSON format in your repo must be the value format `{"key": {"value": "..."}}
 | `mainBranch` | Optional | — | Default `main`. |
 | `nofolding` | Optional | — | JSON only, default `false`. |
 | `convert` | Optional | — | **JSON only.** Set to `true` for import workflow compatibility (exports `{"key":{"value":"..."}}`; import expects this format). Default `false`. |
+| `caseSensetive` | — | Optional | Preserve distinct JSON keys that differ only by casing. Default `false` keeps the original conversion behaviour. |
 | `filesExtension` | Optional | — | JSON only. |
 | `languagePostfixInNames` | Optional | — | JSON only, default `false`. |
 | `reviewer` | Optional | — | PR reviewer. |

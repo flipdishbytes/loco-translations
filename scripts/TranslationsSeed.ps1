@@ -5,10 +5,12 @@
 #   locoWriteKey   - Loco API write/full-access key (https://localise.biz -> Project -> Developer tools)
 #   lang           - Target locale (e.g. 'en')
 #   sourceFile     - Full path to the JSON file to import (e.g. en.json)
+#   caseSensetive  - Use case-sensitive JSON key handling when set to 'true'
 
 $locoWriteKey = $env:locoWriteKey
 $lang = $env:lang
 $sourceFile = $env:sourceFile
+$caseSensetive = $env:caseSensetive -eq 'true'
 
 if ([string]::IsNullOrWhiteSpace($locoWriteKey)) {
     Write-Error "locoWriteKey is not set."
@@ -31,27 +33,44 @@ if (-not (Test-Path -LiteralPath $sourceFile -PathType Leaf)) {
 Write-Host "Seeding translations from $sourceFile to Loco (locale: $lang)..."
 
 $raw = Get-Content -LiteralPath $sourceFile -Raw -Encoding utf8
-# PSCustomObject properties are case-insensitive, but JSON and Loco asset IDs
-# are case-sensitive. Use hashtables so keys such as "Example_Key" and
-# "Example_key" can coexist.
-$data = $raw | ConvertFrom-Json -AsHashtable
 
-# Build flat key -> value for API. Support both:
-#   - Value format:  { "key": { "value": "..." } }
-#   - Flat format:   { "key": "..." }
-$seedData = [System.Collections.Generic.Dictionary[string, object]]::new(
-    [System.StringComparer]::Ordinal
-)
-foreach ($entry in $data.GetEnumerator()) {
-    $key = $entry.Key
-    $val = $entry.Value
-    if ($val -is [System.Collections.IDictionary] -and $val.Contains('value')) {
-        $seedData[$key] = $val['value']
-    } elseif ($val -is [string]) {
-        $seedData[$key] = $val
-    } else {
-        # Fallback: coerce to string (e.g. number or nested object)
-        $seedData[$key] = $val.ToString()
+if ($caseSensetive) {
+    # PSCustomObject properties are case-insensitive, but JSON and Loco asset
+    # IDs are case-sensitive. Use an ordinal dictionary so keys such as
+    # "Example_Key" and "Example_key" can coexist.
+    $data = $raw | ConvertFrom-Json -AsHashtable
+    $seedData = [System.Collections.Generic.Dictionary[string, object]]::new(
+        [System.StringComparer]::Ordinal
+    )
+
+    foreach ($entry in $data.GetEnumerator()) {
+        $key = $entry.Key
+        $val = $entry.Value
+        if ($val -is [System.Collections.IDictionary] -and $val.Contains('value')) {
+            $seedData[$key] = $val['value']
+        } elseif ($val -is [string]) {
+            $seedData[$key] = $val
+        } else {
+            # Fallback: coerce to string (e.g. number or nested object)
+            $seedData[$key] = $val.ToString()
+        }
+    }
+} else {
+    # Preserve the original conversion for backwards compatibility.
+    $data = $raw | ConvertFrom-Json
+    $seedData = @{}
+
+    foreach ($entry in $data.PSObject.Properties) {
+        $key = $entry.Name
+        $val = $entry.Value
+        if ($val -is [System.Management.Automation.PSCustomObject] -and $null -ne $val.PSObject.Properties['value']) {
+            $seedData[$key] = $val.value
+        } elseif ($val -is [string]) {
+            $seedData[$key] = $val
+        } else {
+            # Fallback: coerce to string (e.g. number or nested object)
+            $seedData[$key] = $val.ToString()
+        }
     }
 }
 
