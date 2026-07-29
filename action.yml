@@ -25,6 +25,14 @@ inputs:
     description: 'Preserve JSON translation keys that differ only by casing during import'
     required: false
     default: 'false'
+  deleteRemovedKeys:
+    description: 'Delete Loco assets removed from the source JSON by the triggering push'
+    required: false
+    default: 'false'
+  deleteMaxCount:
+    description: 'Maximum number of automatically removed Loco assets allowed in one run'
+    required: false
+    default: '20'
   filesExtension:
     description: 'Files extension'
     required: false
@@ -132,6 +140,18 @@ runs:
         lang: ${{ steps.validate_import.outputs.lang }}
         sourceFile: ${{ github.workspace }}/${{ inputs.translationsFolder }}/${{ steps.validate_import.outputs.lang }}.json
         caseSensetive: ${{ inputs.caseSensetive }}
+      shell: pwsh
+
+    - name: Delete removed translations from Loco
+      if: steps.mode.outputs.mode == 'import' && inputs.deleteRemovedKeys == 'true' && github.event_name == 'push'
+      run: ${{ github.action_path }}/scripts/TranslationsDelete.ps1
+      env:
+        locoWriteKey: ${{ inputs.locoWriteKey }}
+        sourceFile: ${{ github.workspace }}/${{ inputs.translationsFolder }}/${{ steps.validate_import.outputs.lang }}.json
+        workspace: ${{ github.workspace }}
+        sourceFileRelative: ${{ inputs.translationsFolder }}/${{ steps.validate_import.outputs.lang }}.json
+        previousRevision: ${{ github.event.before }}
+        deleteMaxCount: ${{ inputs.deleteMaxCount }}
       shell: pwsh
 
     - name: Get GitHub App User ID

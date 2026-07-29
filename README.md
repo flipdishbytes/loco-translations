@@ -5,7 +5,7 @@ This custom GitHub Action integrates Loco Translations (`https://localise.biz`) 
 - **Export mode**: Download translations from Loco and create/update a Pull Request with the changed files.
 - **Import mode**: Upload a local JSON translation file (e.g. `en.json`) to Loco so that all keys from the file exist in your Loco project. Use this on push/merge to main to keep Loco in sync with your source of truth.
 
-# Github Action: Loco Translations `flipdishbytes/loco-translations@v1.9`
+# Github Action: Loco Translations `flipdishbytes/loco-translations@v1.10`
 
 ## Modes
 
@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Translations Loco
-        uses: flipdishbytes/loco-translations@v1.9
+        uses: flipdishbytes/loco-translations@v1.10
         with:
           app-id: ${{ vars.LOCO_APP_ID }}
           private-key: ${{ secrets.LOCO_PRIVATE_KEY }}
@@ -87,7 +87,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Translations Loco
-        uses: flipdishbytes/loco-translations@v1.9
+        uses: flipdishbytes/loco-translations@v1.10
         with:
           app-id: ${{ vars.LOCO_APP_ID }} # No need to change/set this in your repository. LOCO_APP_ID variable is set globally.
           private-key: ${{ secrets.LOCO_PRIVATE_KEY }} # No need to change/set this in your repository. LOCO_PRIVATE_KEY secret is set globally.
@@ -161,7 +161,7 @@ jobs:
         with:
           COMMAND: 'tag --level pipeline --tags service:serverless-app-template --tags team:platform-enablement-team --tags env:production'
       - name: Translations Loco
-        uses: flipdishbytes/loco-translations@v1.9
+        uses: flipdishbytes/loco-translations@v1.10
         with:
           locoWriteKey: ${{ secrets.LOCOWRITEKEY }}
           format: 'json'
@@ -173,6 +173,20 @@ jobs:
 ```
 
 The JSON format in your repo must be the value format `{"key": {"value": "..."}}` (see **Requirements** above). The action supports reading both flat and value-wrapped when exporting to Loco, but the repo files must use the value format.
+
+### Optional deletion synchronization
+
+Set `deleteRemovedKeys: 'true'` to make the repository source catalog authoritative for asset removal:
+
+```yaml
+          deleteRemovedKeys: 'true'
+```
+
+On a push, the action compares the source JSON at the previous revision with the current file. Keys missing from the current catalog are permanently deleted from Loco, including all translations across every locale. Keys are compared case-sensitively, so changing only a key's casing adds the new key and removes the old one.
+
+Deletion is skipped for manual runs because they do not contain a previous push revision. A run deletes at most 20 assets by default; `deleteMaxCount` can set a different limit. After deletion, run the normal Loco export/download workflow so the removed assets are also removed from translated repository files through its PR.
+
+Loco deletes assets one at a time, so a failed run can be partially applied. Rerunning the push safely treats already-absent assets as deleted and retries transient API failures.
 
 ---
 
@@ -191,6 +205,8 @@ The JSON format in your repo must be the value format `{"key": {"value": "..."}}
 | `nofolding` | Optional | — | JSON only, default `false`. |
 | `convert` | Optional | — | **JSON only.** Set to `true` for import workflow compatibility (exports `{"key":{"value":"..."}}`; import expects this format). Default `false`. |
 | `caseSensetive` | — | Optional | Preserve distinct JSON keys that differ only by casing. Default `false` keeps the original conversion behaviour. |
+| `deleteRemovedKeys` | — | Optional | Delete Loco assets removed from the source JSON by the triggering push. Default `false`. |
+| `deleteMaxCount` | — | Optional | Maximum automatically removed assets processed in one run. Default `20`. |
 | `filesExtension` | Optional | — | JSON only. |
 | `languagePostfixInNames` | Optional | — | JSON only, default `false`. |
 | `reviewer` | Optional | — | PR reviewer. |
